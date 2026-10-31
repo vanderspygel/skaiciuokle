@@ -1,0 +1,10 @@
+{
+  "name": "skaiciuokle",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Skaičiavimo mokymosi žaidimas su padarėliu (PWA, veikia be interneto)",
+  "scripts": {
+    "test": "node --test"
+  }
+}
