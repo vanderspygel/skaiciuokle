@@ -23,10 +23,11 @@ export const UNLOCK_ACCURACY = 0.8;
 
 // Laiko lygiai (sekundės vienam veiksmui).
 export const SPEEDS = [
-  { id: 'turtle', name: 'Vėžlys', emoji: '🐢', seconds: 35, stars: 2 },
-  { id: 'rabbit', name: 'Kiškis', emoji: '🐇', seconds: 25, stars: 2 },
-  { id: 'fox', name: 'Lapė', emoji: '🦊', seconds: 15, stars: 3 },
-  { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 5, stars: 3 },
+  { id: 'turtle', name: 'Vėžlys', emoji: '🐢', seconds: 40, stars: 2 },
+  { id: 'rabbit', name: 'Kiškis', emoji: '🐇', seconds: 30, stars: 2 },
+  { id: 'fox', name: 'Lapė', emoji: '🦊', seconds: 20, stars: 3 },
+  { id: 'horse', name: 'Žirgas', emoji: '🐎', seconds: 15, stars: 3 },
+  { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 10, stars: 3 },
 ];
 
 // Rašymo režime už teisingą atsakymą (rašyti sunkiau nei bakstelėti).

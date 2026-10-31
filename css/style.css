@@ -255,7 +255,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 /* ===== Nustatymai (mintinai / kontrolinis) ===== */
 .setup-body { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 10px 0 20px; }
 .setup-hint { font-size: 30px; font-weight: 800; margin: 10px 0 0; }
-.speed-row { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 16px; width: 100%; max-width: 900px; }
+.speed-row { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 14px; width: 100%; max-width: 1000px; }
 .speed-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 170px; font-size: 24px; }
 .speed-emoji { font-size: 66px; line-height: 1.1; }
 .speed-stars { font-size: 16px; }
@@ -542,7 +542,9 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
   .create-preview { max-width: 240px; }
   .shop-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .shop-monster { width: 150px; height: 170px; }
-  .speed-row { grid-template-columns: repeat(2, 1fr); }
+  .speed-row { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .speed-btn { min-height: 150px; padding: 8px 4px; font-size: 20px; }
+  .speed-emoji { font-size: 52px; }
   .quiz-monster { width: 120px; height: 140px; }
   .frame { grid-template-columns: repeat(5, 72px); grid-template-rows: repeat(2, 72px); }
   .dot { width: 56px; height: 56px; font-size: 26px; }
