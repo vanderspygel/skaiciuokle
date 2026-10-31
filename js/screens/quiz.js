@@ -31,11 +31,13 @@ export function render(ctx, params) {
 
   // Įvedimo būdas: visada visi skaičiai 0–10, kad nebūtų galima tiesiog atspėti.
   // Palyginimas – du mygtukai su reiškiniais.
+  // Rašyti ranka: rašymo režime visada, mintinai ir kontroliniame – jei pasirinkta.
   const isWrite = mode === 'write';
-  const inputFor = p => (p.kind === 'compare' ? 'choice' : isWrite ? 'draw' : 'pad');
+  const useDraw = isWrite || params.input === 'draw';
+  const inputFor = p => (p.kind === 'compare' ? 'choice' : useDraw ? 'draw' : 'pad');
 
   // Rašymui: numatytieji pavyzdžiai + vaiko rašysena.
-  let templates = isWrite ? buildTemplates(s.handwriting.samples) : null;
+  let templates = useDraw ? buildTemplates(s.handwriting.samples) : null;
   let pad = null;
   let lastRead = null;
 
@@ -70,7 +72,7 @@ export function render(ctx, params) {
       walker);
   }
 
-  const title = level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}`;
+  const title = level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}${useDraw ? ' ✍️' : ''}`;
   const el = screen('quiz' + (isTest ? '.is-test' : ''),
     topBar(ctx, { back: mode === 'practice' ? 'levels' : 'home', title, extra: dots }),
     track,
@@ -327,6 +329,17 @@ export function render(ctx, params) {
     if (check) check.disabled = selected === null;
   }
 
+  // Teisingai perskaitytas teisingas atsakymas – geras rašysenos pavyzdys, mokomės iš jo.
+  function learnFromDrawing() {
+    if (!useDraw || !lastRead) return;
+    s.counters.written += 1;
+    if (lastRead.digits.length === lastRead.groups.length) {
+      lastRead.groups.forEach((g, k) => addSample(s.handwriting.samples, lastRead.digits[k], g));
+      templates = buildTemplates(s.handwriting.samples);
+    }
+    pad?.setEnabled(false);
+  }
+
   // ---------- Atsakymo tikrinimas ----------
   function answer(value, btn) {
     if (locked) return;
@@ -338,7 +351,8 @@ export function render(ctx, params) {
       stopTimer();
       recordResult(s.stats, problem, correct, ms);
       log.push({ problem, value, correct });
-      if (correct) { s.counters.correct += 1; ctx.played(); }
+      if (correct) { s.counters.correct += 1; ctx.played(); learnFromDrawing(); }
+      else pad?.setEnabled(false);
       if (btn) btn.classList.add('picked');
       ctx.save();
       advance(350);
@@ -364,15 +378,7 @@ export function render(ctx, params) {
       const fast = speed && firstTry && (performance.now() - timerStart) <= speed.seconds * 500;
       stopTimer();
       let stars = speed ? speed.stars : isWrite ? WRITE_STARS : 1;
-      if (isWrite) {
-        s.counters.written += 1;
-        // Teisingai perskaitytas atsakymas – geras rašysenos pavyzdys, mokomės iš jo.
-        if (lastRead && lastRead.digits.length === lastRead.groups.length) {
-          lastRead.groups.forEach((g, k) => addSample(s.handwriting.samples, lastRead.digits[k], g));
-          templates = buildTemplates(s.handwriting.samples);
-        }
-        pad?.setEnabled(false);
-      }
+      learnFromDrawing();
       if (fast) { stars += FAST_BONUS; s.counters.fast += 1; }
       const streakBonus = updateStreak(s, firstTry);
       s.counters.correct += 1;
@@ -496,7 +502,7 @@ export function render(ctx, params) {
   function finish() {
     stopTimer();
     if (isTest) {
-      ctx.go('results', { log, speed: speed.id, count: total });
+      ctx.go('results', { log, speed: speed.id, count: total, input: params.input });
       return;
     }
     if (mode === 'review' && reviewAllRight) {

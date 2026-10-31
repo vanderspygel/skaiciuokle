@@ -10,7 +10,9 @@ import { topBar, screen } from './common.js';
 const ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const THANKS = ['Aha!', 'Supratau!', 'Gražu!', 'Įsiminiau!', 'Ačiū!'];
 
-export function render(ctx, { next } = {}) {
+// after: užduoties parametrai, nuo kurių pradėti po mokymo (pvz., mintinai su rašymu).
+export function render(ctx, { after } = {}) {
+  const goal = after || { mode: 'write' };
   const s = ctx.state;
   let i = 0;
 
@@ -63,8 +65,8 @@ export function render(ctx, { next } = {}) {
       h('div.overlay-emoji', null, '🎓'),
       h('div.overlay-text', null, 'Ačiū! Dabar suprantu tavo rašyseną!'),
       h('div.overlay-buttons', null,
-        h('button.btn.btn-primary.btn-big', { onclick: () => ctx.go('quiz', { mode: 'write' }) }, 'Rašom! ✍️'),
-        h('button.btn.btn-secondary.btn-big', { onclick: () => ctx.go(next === 'write' ? 'home' : 'setup', next === 'write' ? {} : { mode: 'write' }) }, next === 'write' ? 'Namo 🏠' : 'Atgal'))));
+        h('button.btn.btn-primary.btn-big', { onclick: () => ctx.go('quiz', goal) }, 'Pradedam! ✍️'),
+        h('button.btn.btn-secondary.btn-big', { onclick: () => ctx.go('home') }, 'Namo 🏠'))));
     mv.react('cheer');
     confetti(40);
   }
@@ -76,7 +78,7 @@ export function render(ctx, { next } = {}) {
   show();
 
   const el = screen('teach',
-    topBar(ctx, { back: 'setup', backParams: { mode: 'write' }, title: 'Išmokyk padarėlį', extra: dots }),
+    topBar(ctx, { back: 'setup', backParams: { mode: goal.mode }, title: 'Išmokyk padarėlį', extra: dots }),
     h('p.teach-intro', null, 'Padarėlis nori išmokti, kaip tu rašai skaičius.'),
     body);
   return { el, destroy() { pad.destroy(); } };

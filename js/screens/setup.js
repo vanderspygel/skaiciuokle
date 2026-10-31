@@ -10,9 +10,21 @@ export function render(ctx, { mode }) {
   const isTest = mode === 'test';
   let speed = s.prefs.lastSpeed || 'turtle';
   let count = s.prefs.lastTestCount || 10;
+  let input = s.prefs.lastInput || 'pad';
 
   const speedRow = h('div.speed-row');
   const countRow = h('div.count-row');
+  const inputRow = h('div.count-row');
+
+  // Kaip atsakyti: skaičių mygtukais ar rašant ranka.
+  function drawInputs() {
+    inputRow.textContent = '';
+    for (const [id, label] of [['pad', '🔢 Mygtukai'], ['draw', '✍️ Rašyti ranka']]) {
+      inputRow.append(h('button.btn.count-btn' + (id === input ? '.selected' : ''), {
+        onclick: () => { input = id; drawInputs(); },
+      }, label));
+    }
+  }
 
   function drawSpeeds() {
     speedRow.textContent = '';
@@ -24,6 +36,7 @@ export function render(ctx, { mode }) {
           else drawSpeeds();
         },
       }, h('span.speed-emoji', null, sp.emoji), h('span', null, sp.name),
+        h('span.speed-secs', null, `${sp.seconds} s`),
         h('span.speed-stars', null, '⭐'.repeat(sp.stars))));
     }
   }
@@ -40,12 +53,17 @@ export function render(ctx, { mode }) {
   function start() {
     s.prefs.lastSpeed = speed;
     s.prefs.lastTestCount = count;
+    s.prefs.lastInput = input;
     ctx.save();
-    ctx.go('quiz', { mode, speed, count });
+    const params = { mode, speed, count, input };
+    // Rašyti ranka dar neišmokyta – pirmiausia trumpas mokymas, paskui iškart pradedam.
+    if (input === 'draw' && !knownDigits(s)) ctx.go('teach', { after: params });
+    else ctx.go('quiz', params);
   }
 
   drawSpeeds();
   drawCounts();
+  drawInputs();
 
   let history = null;
   if (isTest && s.tests.length) {
@@ -64,20 +82,26 @@ export function render(ctx, { mode }) {
   const el = screen('setup',
     topBar(ctx, { title: isTest ? 'Kontrolinis' : 'Mintinai' }),
     h('div.setup-body', null,
-      h('p.setup-hint', null, isTest ? 'Kiek užduočių?' : 'Kokiu greičiu?'),
+      isTest ? h('p.setup-hint', null, 'Kiek užduočių?') : null,
       isTest ? countRow : null,
-      isTest ? h('p.setup-hint', null, 'Kokiu greičiu?') : null,
+      h('p.setup-hint', null, 'Kaip atsakysi?'),
+      inputRow,
+      h('p.setup-hint', null, 'Kokiu greičiu?'),
       speedRow,
       isTest ? h('button.btn.btn-primary.btn-big.start-btn', { onclick: start }, 'Pradedam! 🚀') : null,
       history));
   return { el };
 }
 
+function knownDigits(s) {
+  const samples = s.handwriting.samples;
+  return Object.keys(samples).filter(d => samples[d].length).length;
+}
+
 // Rašymo režimas: pradėti arba išmokyti padarėlį savo rašysenos.
 function renderWrite(ctx) {
-  const samples = ctx.state.handwriting.samples;
-  const known = Object.keys(samples).filter(d => samples[d].length).length;
-  const start = () => ctx.go(known ? 'quiz' : 'teach', known ? { mode: 'write' } : { next: 'write' });
+  const known = knownDigits(ctx.state);
+  const start = () => ctx.go(known ? 'quiz' : 'teach', known ? { mode: 'write' } : { after: { mode: 'write' } });
 
   const el = screen('setup',
     topBar(ctx, { title: 'Rašyti' }),

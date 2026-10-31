@@ -7,7 +7,7 @@ import { dateKey } from '../rewards.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
 
-export function render(ctx, { log, speed, count }) {
+export function render(ctx, { log, speed, count, input }) {
   const s = ctx.state;
   const ok = log.filter(x => x.correct).length;
   const rating = testRating(ok / count);
@@ -35,7 +35,7 @@ export function render(ctx, { log, speed, count }) {
         h('span.mistake-yours', null, m.value === null ? '⏰' : answerText(m.problem, m.value)),
         h('span.mistake-arrow', null, '→'),
         h('span.mistake-right', null, answerText(m.problem, m.problem.answer))))),
-      h('button.btn.btn-primary.btn-big', { onclick: () => ctx.go('quiz', { mode: 'review', problems: mistakes.map(m => m.problem) }) }, 'Pakartoti klaidas 🔍'))
+      h('button.btn.btn-primary.btn-big', { onclick: () => ctx.go('quiz', { mode: 'review', input, problems: mistakes.map(m => m.problem) }) }, 'Pakartoti klaidas 🔍'))
     : null;
 
   const el = screen('results',
