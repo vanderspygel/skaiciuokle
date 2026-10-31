@@ -26,17 +26,9 @@ export function render(ctx, params) {
   const limits = (level && level.limits) || LIMITS;
   const total = isTest ? params.count : mode === 'review' ? params.problems.length : ROUND;
 
-  // Įvedimo būdas.
-  const padUnlocked = s.progress.unlocked >= 4;
-  function inputFor(p) {
-    if (p.kind === 'compare') return 'choice';
-    if (level) {
-      if (level.input === 'mixed') return Math.random() < 0.5 ? 'pad' : 'choice';
-      return level.input;
-    }
-    return padUnlocked ? 'pad' : 'choice';
-  }
-  const choiceCount = (level && level.choices) || 4;
+  // Įvedimo būdas: visada visi skaičiai 0–10, kad nebūtų galima tiesiog atspėti.
+  // Palyginimas – du mygtukai su reiškiniais.
+  const inputFor = p => (p.kind === 'compare' ? 'choice' : 'pad');
 
   // Užduočių šaltinis.
   let scheduler = null;
@@ -253,14 +245,15 @@ export function render(ctx, params) {
     const type = inputFor(problem);
     answersEl.className = 'answers answers-' + type;
     if (type === 'choice') {
-      const opts = makeChoices(problem, choiceCount, Math.random, limits);
+      const opts = makeChoices(problem, 2, Math.random, limits);
       for (const v of opts) {
         const label = problem.kind === 'compare' ? (v === 'left' ? problem.left.text : problem.right.text) : v;
         const btn = h('button.btn.choice', { onclick: () => answer(v, btn) }, label);
         answersEl.append(btn);
       }
     } else {
-      const max = Math.max(limits.maxResult, limits.maxNumber);
+      // Mygtukai pagal bendras ribas (ne lygio), kad ir 1 lygyje būtų visi 0–10.
+      const max = Math.max(LIMITS.maxResult, LIMITS.maxNumber);
       const pad = h('div.numpad');
       const keys = [];
       for (let v = 1; v <= max; v++) keys.push(v);

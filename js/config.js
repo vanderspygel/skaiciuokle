@@ -4,15 +4,15 @@
 export const LIMITS = { maxNumber: 10, maxResult: 10 };
 
 // Įprasto skaičiavimo lygiai.
-// kinds: kokių tipų užduotys; visual: ar rodyti dešimties rėmelį;
-// input: 'choice' | 'pad' | 'mixed'; choices: kiek atsakymų variantų.
+// kinds: kokių tipų užduotys; visual: ar rodyti dešimties rėmelį.
+// Atsakymai visada renkami skaičių mygtukais 0–10 (palyginimas – dviem mygtukais).
 export const LEVELS = [
-  { id: 1, title: 'Sudėtis iki 5', icon: '➕', kinds: ['add'], limits: { maxNumber: 5, maxResult: 5 }, visual: true, input: 'choice', choices: 3 },
-  { id: 2, title: 'Sudėtis iki 10', icon: '➕', kinds: ['add'], visual: true, input: 'choice', choices: 4 },
-  { id: 3, title: 'Atimtis iki 10', icon: '➖', kinds: ['sub'], visual: true, input: 'choice', choices: 4 },
-  { id: 4, title: 'Sudėtis ir atimtis', icon: '🔢', kinds: ['add', 'sub'], visual: false, input: 'pad' },
-  { id: 5, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub'], visual: false, input: 'pad' },
-  { id: 6, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], visual: false, input: 'mixed', choices: 4 },
+  { id: 1, title: 'Sudėtis iki 5', icon: '➕', kinds: ['add'], limits: { maxNumber: 5, maxResult: 5 }, visual: true },
+  { id: 2, title: 'Sudėtis iki 10', icon: '➕', kinds: ['add'], visual: true },
+  { id: 3, title: 'Atimtis iki 10', icon: '➖', kinds: ['sub'], visual: true },
+  { id: 4, title: 'Sudėtis ir atimtis', icon: '🔢', kinds: ['add', 'sub'], visual: false },
+  { id: 5, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub'], visual: false },
+  { id: 6, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], visual: false },
 ];
 
 // Kitas lygis atrakinamas, kai lygyje surinkta UNLOCK_CORRECT teisingų
