@@ -523,8 +523,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .badge-reward { font-size: 22px; font-weight: 800; color: #c98a00; }
 
 /* Pradėti iš naujo (tėvams) */
-.reset-row { display: flex; justify-content: center; padding: 10px 0 24px; }
-.reset-btn { font-size: 18px; min-height: 64px; color: var(--muted); background: transparent; box-shadow: none; border-style: dashed; }
+.reset-btn { font-size: 18px; min-height: 64px; padding: 8px 14px; color: var(--muted); background: transparent; box-shadow: none; border-style: dashed; white-space: nowrap; }
 .gate { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .gate-title { font-size: 30px; font-weight: 900; }
 .gate-text { font-size: 20px; font-weight: 600; margin: 0; line-height: 1.35; }

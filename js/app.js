@@ -117,11 +117,18 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW klaida', e));
   });
-  // Atėjus naujai versijai – perkraunam tik ramiame ekrane, kad nepertrauktume žaidimo.
+  // Atėjus naujai versijai – perkraunam, bet ne užduoties ar mokymo viduryje
+  // (tada nauja versija įsijungs kitą kartą grįžus į pagrindinį ekraną).
   const hadController = !!navigator.serviceWorker.controller;
+  let updateReady = false;
+  const busy = () => ['quiz', 'teach', 'create'].includes(root.dataset.screen);
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (hadController && (root.dataset.screen === 'home' || root.dataset.screen === 'create')) location.reload();
+    if (!hadController) return;
+    if (busy()) updateReady = true;
+    else location.reload();
   });
+  new MutationObserver(() => { if (updateReady && !busy()) location.reload(); })
+    .observe(root, { attributes: true, attributeFilter: ['data-screen'] });
 }
 
 start();

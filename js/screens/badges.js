@@ -81,14 +81,15 @@ export function render(ctx) {
 
   const c = s.counters;
   const el = screen('badges',
-    topBar(ctx, { title: 'Ženkliukai' }),
+    topBar(ctx, {
+      title: 'Ženkliukai',
+      extra: h('button.btn.reset-btn', { 'aria-label': 'Pradėti iš naujo', onclick: () => openReset(ctx) }, '🔄 Iš naujo'),
+    }),
     h('div.badges-summary', null,
       h('div.stat', null, h('b', null, `${got}/${ACHIEVEMENTS.length}`), h('span', null, 'ženkliukų')),
       h('div.stat', null, h('b', null, c.correct), h('span', null, 'teisingų')),
       h('div.stat', null, h('b', null, s.days.streak || 0), h('span', null, 'dienų iš eilės')),
       h('div.stat', null, h('b', null, s.totalEarned), h('span', null, 'iš viso ⭐'))),
-    h('div.badge-grid', null, cards),
-    h('div.reset-row', null,
-      h('button.btn.reset-btn', { onclick: () => openReset(ctx) }, '🔄 Pradėti iš naujo')));
+    h('div.badge-grid', null, cards));
   return { el };
 }
