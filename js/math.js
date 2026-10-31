@@ -263,6 +263,18 @@ export function makeChoices(problem, count = 4, rng = Math.random, limits = DEFA
   return shuffle([ans, ...picked.slice(0, count - 1)], rng);
 }
 
+// Užduotis tėvams (apsauga nuo atsitiktinio ištrynimo): dviženkliai skaičiai iki 100.
+export function makeGateProblem(rng = Math.random) {
+  if (rng() < 0.5) {
+    const a = randInt(rng, 12, 88);
+    const b = randInt(rng, 11, 100 - a);
+    return { text: `${a} + ${b}`, answer: a + b };
+  }
+  const a = randInt(rng, 31, 99);
+  const b = randInt(rng, 11, a - 11);
+  return { text: `${a} − ${b}`, answer: a - b };
+}
+
 export function checkAnswer(problem, value) {
   return value === problem.answer;
 }

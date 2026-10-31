@@ -522,6 +522,20 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .badge-desc { font-size: 24px; font-weight: 700; }
 .badge-reward { font-size: 22px; font-weight: 800; color: #c98a00; }
 
+/* Pradėti iš naujo (tėvams) */
+.reset-row { display: flex; justify-content: center; padding: 10px 0 24px; }
+.reset-btn { font-size: 18px; min-height: 64px; color: var(--muted); background: transparent; box-shadow: none; border-style: dashed; }
+.gate { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.gate-title { font-size: 30px; font-weight: 900; }
+.gate-text { font-size: 20px; font-weight: 600; margin: 0; line-height: 1.35; }
+.gate-task { font-size: 52px; font-weight: 900; margin-top: 6px; }
+.gate-input { font-size: 40px; font-weight: 800; text-align: center; width: 160px; padding: 8px; border: 3px solid var(--line); border-radius: 18px; color: var(--ink); }
+.gate-input:focus { outline: none; border-color: var(--primary); }
+.gate-wrong { color: #c97d00; font-weight: 800; font-size: 20px; margin: 0; }
+.gate-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.btn-danger { background: #e5484d; color: #fff; border-color: #b8353a; box-shadow: 0 5px 0 #b8353a; }
+.btn-danger:active:not(:disabled) { box-shadow: 0 1px 0 #b8353a; }
+
 /* ===== Vertikali padėtis ir mažesni ekranai ===== */
 @media (orientation: portrait) {
   .create-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }

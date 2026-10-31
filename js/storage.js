@@ -75,6 +75,16 @@ export function save(state) {
   }
 }
 
+// Ištrina visą progresą (padarėlį, žvaigždutes, pasiekimus, rašyseną).
+export function resetAll() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch (e) {
+    console.warn('Nepavyko ištrinti duomenų', e);
+  }
+  return defaultState();
+}
+
 export async function requestPersist() {
   try {
     if (navigator.storage && navigator.storage.persist) {

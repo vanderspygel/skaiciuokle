@@ -3,7 +3,19 @@ import assert from 'node:assert/strict';
 import {
   makeProblem, enumerateFacts, makeCompare, makeChoices, checkAnswer,
   Scheduler, recordResult, factWeight, mulberry32, pickWeighted, problemText,
+  makeGateProblem,
 } from '../js/math.js';
+
+test('tėvų užduotis: dviženkliai, rezultatas 0–100', () => {
+  const rng = mulberry32(8);
+  for (let i = 0; i < 500; i++) {
+    const g = makeGateProblem(rng);
+    const [a, op, b] = g.text.split(' ');
+    assert.ok(+a >= 10 && +b >= 10, g.text);
+    assert.equal(g.answer, op === '+' ? +a + +b : +a - +b);
+    assert.ok(g.answer >= 0 && g.answer <= 100, g.text);
+  }
+});
 
 const L10 = { maxNumber: 10, maxResult: 10 };
 const L5 = { maxNumber: 5, maxResult: 5 };

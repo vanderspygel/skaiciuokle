@@ -72,6 +72,10 @@ Vaiko duomenys (žvaigždutės, padarėlis, pasiekimai) atnaujinant **nepraranda
 
 > ⚠️ Duomenys dingtų, jei ištrintum ikoną iš pradžios ekrano arba išvalytum Safari svetainių duomenis.
 
+## Kaip pradėti iš naujo
+
+**Ženkliukai** ekrano apačioje – mygtukas **🔄 Pradėti iš naujo**. Jis apsaugotas tėvų užduotimi (sudėtis arba atimtis su dviženkliais skaičiais iki 100; suklydus duodama kita užduotis), o paskui dar kartą paklausiama „Ar tikrai?“. Ištrinama viskas: padarėlis, žvaigždutės, ženkliukai, lygiai, kambarys, kontrolinių istorija ir išmokta rašysena.
+
 ## Testai
 
 ```bash
