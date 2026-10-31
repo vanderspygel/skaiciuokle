@@ -1,7 +1,7 @@
 // Service worker: visi failai kešuojami (cache-first), žaidimas veikia be interneto.
 // SVARBU: po kiekvieno pakeitimo padidink VERSION, kitaip iPad'as neatsinaujins.
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `skaiciuokle-${VERSION}`;
 
 const ASSETS = [
@@ -18,6 +18,9 @@ const ASSETS = [
   './js/monsterView.js',
   './js/catalog.js',
   './js/ui.js',
+  './js/handwriting.js',
+  './js/drawpad.js',
+  './js/screens/teach.js',
   './js/screens/common.js',
   './js/screens/home.js',
   './js/screens/create.js',

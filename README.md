@@ -20,8 +20,10 @@ js/
   monsterView.js         padarėlis su animacijomis ir reakcijomis
   catalog.js             parduotuvės prekės ir kainos
   ui.js                  pagalbinės funkcijos (konfeti, langeliai)
+  handwriting.js         ranka rašytų skaitmenų atpažinimas ($P metodas, be interneto)
+  drawpad.js             piešimo lenta pirštui
   app.js                 paleidimas, ekranų perjungimas
-  screens/               ekranai: home, create, levels, setup, quiz, results, shop, room, badges
+  screens/               ekranai: home, create, levels, setup, quiz, results, shop, room, badges, teach
 icons/                   ikonos (180, 192, 512 PNG ir SVG)
 tests/                   testai (node --test) ir tests/browser/ – tie patys testai naršyklėje
 scripts/make_icons.py    PNG ikonų generatorius (Python be papildomų bibliotekų)
@@ -76,7 +78,7 @@ Vaiko duomenys (žvaigždutės, padarėlis, pasiekimai) atnaujinant **nepraranda
 node --test
 ```
 
-Testuojamas `js/math.js` (ribos, užduočių tipai, atsakymų variantai, adaptyvumas, pakartojimas po 2–4 užduočių, jokio kartojimo iš eilės) ir `js/rewards.js` (žvaigždutės, augimas, lygių atrakinimas, dienų serija, pasiekimai, migracija).
+Testuojamas `js/handwriting.js` (skaitmenų atpažinimas, „10“ skaidymas, mokymasis iš vaiko pavyzdžių), `js/math.js` (ribos, užduočių tipai, atsakymų variantai, adaptyvumas, pakartojimas po 2–4 užduočių, jokio kartojimo iš eilės) ir `js/rewards.js` (žvaigždutės, augimas, lygių atrakinimas, dienų serija, pasiekimai, migracija).
 
 Jei Node.js neįdiegtas, tuos pačius testus galima paleisti naršyklėje: paleisk vietinį serverį (pvz., `python -m http.server`) ir atidaryk `http://localhost:8000/tests/browser/`.
 
@@ -92,6 +94,8 @@ Smulkūs sprendimai, priimti kuriant:
 
 - **Lygių atrakinimas:** kitas lygis atsidaro, kai lygyje surinkta 15 teisingų atsakymų (iš pirmo karto), o paskutinių 20 atsakymų tikslumas ≥ 80 %. Visi atrakinti lygiai lieka prieinami.
 - **Įvedimas:** visuose lygiuose ir režimuose – visi skaičių mygtukai 0–10 ir „Tikrinti“ (kaip rašymas, atsakymo neatspėsi iš kelių variantų). Palyginimas – du mygtukai su reiškiniais.
+- **Rašymo režimas (✍️ Rašyti):** atsakymas rašomas pirštu. Atpažinimas – „$P“ taškų debesų metodas (piešinys → 32 taškai, lyginama su pavyzdžiais), veikia be interneto ir be didelių modelių. Prieš pirmą kartą vaikas „išmoko padarėlį“ – po kartą parašo 0–9; jos pavyzdžiai sveriami šiek tiek labiau nei numatytieji. Kiekvienas teisingai perskaitytas teisingas atsakymas tampa nauju pavyzdžiu (iki 6 kiekvienam skaitmeniui, seni keičiami naujais), tad atpažinimas gerėja žaidžiant.
+- **Rašymas – patvirtinimas:** perskaitytas skaičius rodomas „?“ langelyje, ir tik paspaudus „Tikrinti“ jis tikrinamas. Jei programa perskaitė neteisingai, vaikas tiesiog spaudžia „Trinti“ – tai neskaičiuojama kaip klaida. Neaiškus piešinys → „Nesupratau 🤔“. „10“ rašomas kaip du skaitmenys greta (brūkšniai grupuojami pagal padėtį). Rašyme palyginimų nėra; už teisingą atsakymą 2 ⭐, laiko nėra.
 - **Raundas:** įprastas skaičiavimas ir mintinai vyksta raundais po 10 užduočių, kad būtų aiški pabaiga ir pagyrimas.
 - **Adaptyvumas:** svoris = bazė × (0,4 + 4 × klaidų dalis) × lėtumas (vidutinis laikas / 6 s, ribose 0,5–3). Nematytos užduotys gauna šiek tiek didesnį svorį, paskutinės 4 – mažesnį. Lengvos užduotys su 0 rodomos rečiau. Užduočių tipas pirmiausia parenkamas pagal tipo vidutinį svorį, tada konkreti užduotis.
 - **Statistika:** fiksuojamas tik pirmas atsakymas į užduotį. Visi palyginimai kaupiami po vienu raktu `cmp` (jų derinių per daug, jie generuojami atsitiktinai).

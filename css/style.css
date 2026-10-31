@@ -183,7 +183,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .growth-bar { width: 200px; height: 18px; background: #fff; border: 3px solid var(--line); border-radius: 999px; overflow: hidden; }
 .growth-fill { height: 100%; background: linear-gradient(90deg, #ffd23f, #7ed957); border-radius: 999px; }
 
-.home-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px; }
+.home-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; }
 .btn-mode {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   min-height: 130px; font-size: 28px; color: #fff; border-radius: 30px;
@@ -192,6 +192,8 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .mode-practice { background: var(--blue); border-color: #2f7bd6; box-shadow: 0 7px 0 #2f7bd6; }
 .mode-mental { background: var(--orange); border-color: #d9701a; box-shadow: 0 7px 0 #d9701a; }
 .mode-test { background: var(--green); border-color: #26914f; box-shadow: 0 7px 0 #26914f; }
+.mode-write { background: #f06fa8; border-color: #c94a84; box-shadow: 0 7px 0 #c94a84; }
+.mode-write:active { box-shadow: 0 2px 0 #c94a84; }
 .mode-practice:active { box-shadow: 0 2px 0 #2f7bd6; }
 .mode-mental:active { box-shadow: 0 2px 0 #d9701a; }
 .mode-test:active { box-shadow: 0 2px 0 #26914f; }
@@ -332,6 +334,31 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .key.selected { background: #f1ebff; border-color: var(--primary); box-shadow: 0 5px 0 var(--primary-dark); }
 .key.right { background: #e6f8ee; border-color: var(--good); }
 .key-check { grid-column: span 4; font-size: 30px; min-height: 78px; }
+
+/* Rašymo lenta */
+.drawpad { position: relative; border: 4px dashed #cfc3e8; border-radius: 28px; background: #fff; touch-action: none; }
+.drawpad.disabled { opacity: .6; }
+.drawpad-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.drawpad-hint { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; opacity: 1; pointer-events: none; transition: opacity .2s; filter: grayscale(.3) opacity(.35); }
+.draw-area { display: flex; align-items: stretch; gap: 16px; }
+.draw-area .drawpad { width: min(480px, 60vw); height: 250px; }
+.draw-buttons { display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.draw-buttons.row { flex-direction: row; justify-content: center; }
+.draw-buttons .key-check { min-width: 180px; }
+.draw-clear { font-size: 24px; min-height: 78px; }
+.answers-draw { min-height: 260px; }
+
+/* Mokymas */
+.teach-intro { text-align: center; font-size: 22px; font-weight: 700; color: var(--muted); margin: 0 0 6px; }
+.teach-body { flex: 1; display: grid; grid-template-columns: minmax(220px, 34%) 1fr; gap: 20px; align-items: center; min-height: 0; }
+.teach-left { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.teach-monster { width: 150px; height: 170px; }
+.teach-prompt { font-size: 30px; font-weight: 900; text-align: center; }
+.teach-example { font-size: 150px; font-weight: 800; line-height: 1; color: var(--primary); opacity: .8; }
+.teach-right { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.teach-right .drawpad { width: min(440px, 90%); aspect-ratio: 1 / 1; max-height: 52vh; }
+.teach-body > .overlay-card { grid-column: 1 / -1; justify-self: center; }
+.write-hero { font-size: 96px; line-height: 1; }
 
 .quiz-monster { position: absolute; left: calc(8px + var(--safe-l)); bottom: calc(8px + var(--safe-b)); width: 130px; height: 150px; z-index: 3; }
 .is-test .quiz-monster { opacity: .9; }
@@ -506,6 +533,10 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
   .frame { grid-template-columns: repeat(5, 72px); grid-template-rows: repeat(2, 72px); }
   .dot { width: 56px; height: 56px; font-size: 26px; }
   .home-monster { width: min(70vw, 440px); height: min(42vh, 500px); }
+  .home-modes { grid-template-columns: repeat(2, 1fr); }
+  .draw-area .drawpad { width: min(520px, 62vw); height: 300px; }
+  .teach-body { grid-template-columns: 1fr; }
+  .teach-example { font-size: 90px; }
 }
 
 @media (max-height: 820px) and (orientation: landscape) {
@@ -518,6 +549,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
   .problem { font-size: clamp(60px, 9vh, 96px); }
   .home-monster { height: min(42vh, 380px); }
   .btn-mode { min-height: 110px; }
+  .draw-area .drawpad { height: 230px; }
 }
 
 @media (max-width: 700px) {

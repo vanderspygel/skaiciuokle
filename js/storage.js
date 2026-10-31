@@ -15,7 +15,8 @@ export function defaultState() {
     progress: { unlocked: 1, levels: {} },
     stats: {},
     streak: 0,
-    counters: { correct: 0, fast: 0, bestStreak: 0, purchases: 0, tests: 0, perfectTests: 0, perfectCheetah: 0, mistakesCleared: 0, fed: 0 },
+    counters: { correct: 0, fast: 0, bestStreak: 0, purchases: 0, tests: 0, perfectTests: 0, perfectCheetah: 0, mistakesCleared: 0, fed: 0, written: 0 },
+    handwriting: { samples: {} }, // vaiko rašysenos pavyzdžiai: { '3': [suglaudintas debesis, ...] }
     days: { last: null, streak: 0, best: 0, total: 0 },
     tests: [],
     badges: {},

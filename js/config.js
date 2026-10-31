@@ -29,6 +29,9 @@ export const SPEEDS = [
   { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 10, stars: 3 },
 ];
 
+// Rašymo režime už teisingą atsakymą (rašyti sunkiau nei bakstelėti).
+export const WRITE_STARS = 2;
+
 export const STREAK_BONUS_EVERY = 5;
 export const STREAK_BONUS = 2;
 export const FAST_BONUS = 1;

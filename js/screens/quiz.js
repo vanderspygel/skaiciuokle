@@ -2,11 +2,14 @@
 //  practice – įprastas skaičiavimas pagal lygį (be laiko, su vaizdine pagalba 1–3 lygiuose);
 //  mental   – mintinai su vizualiu laikmačiu;
 //  test     – kontrolinis (be grįžtamojo ryšio, laikas kiekvienam veiksmui);
-//  review   – kontrolinio klaidų pakartojimas.
+//  review   – kontrolinio klaidų pakartojimas;
+//  write    – atsakymas rašomas pirštu (be laiko).
 
 import { h, svgEl, pulse, confetti, toast } from '../ui.js';
-import { LEVELS, LIMITS, SPEEDS, FAST_BONUS } from '../config.js';
+import { LEVELS, LIMITS, SPEEDS, FAST_BONUS, WRITE_STARS } from '../config.js';
 import { Scheduler, makeChoices, checkAnswer, recordResult } from '../math.js';
+import { buildTemplates, recognizeNumber, addSample } from '../handwriting.js';
+import { drawPad } from '../drawpad.js';
 import { updateStreak, recordLevelAnswer, unlockedKinds, stageFor } from '../rewards.js';
 import { monsterSVG } from '../monster.js';
 import { monsterView } from '../monsterView.js';
@@ -28,13 +31,23 @@ export function render(ctx, params) {
 
   // Įvedimo būdas: visada visi skaičiai 0–10, kad nebūtų galima tiesiog atspėti.
   // Palyginimas – du mygtukai su reiškiniais.
-  const inputFor = p => (p.kind === 'compare' ? 'choice' : 'pad');
+  const isWrite = mode === 'write';
+  const inputFor = p => (p.kind === 'compare' ? 'choice' : isWrite ? 'draw' : 'pad');
 
-  // Užduočių šaltinis.
+  // Rašymui: numatytieji pavyzdžiai + vaiko rašysena.
+  let templates = isWrite ? buildTemplates(s.handwriting.samples) : null;
+  let pad = null;
+  let lastRead = null;
+
+  // Užduočių šaltinis. Rašyme palyginimų nėra – ten nėra ką rašyti.
   let scheduler = null;
   let reviewQueue = null;
   if (mode === 'review') reviewQueue = params.problems.slice();
-  else scheduler = new Scheduler({ kinds: level ? level.kinds : unlockedKinds(s), limits, stats: s.stats });
+  else {
+    let kinds = level ? level.kinds : unlockedKinds(s);
+    if (isWrite) kinds = kinds.filter(k => k !== 'compare');
+    scheduler = new Scheduler({ kinds, limits, stats: s.stats });
+  }
 
   // ---------- DOM ----------
   const dots = h('div.progress-dots', null, Array.from({ length: total }, () => h('i')));
@@ -57,7 +70,7 @@ export function render(ctx, params) {
       walker);
   }
 
-  const title = level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : `${speed.emoji} ${speed.name}`;
+  const title = level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}`;
   const el = screen('quiz' + (isTest ? '.is-test' : ''),
     topBar(ctx, { back: mode === 'practice' ? 'levels' : 'home', title, extra: dots }),
     track,
@@ -240,10 +253,49 @@ export function render(ctx, params) {
   }
 
   // ---------- Atsakymai ----------
+  function removePad() {
+    if (pad) { pad.destroy(); pad = null; }
+  }
+
+  // Perskaitom, ką vaikas parašė, ir parodom tai „?“ langelyje.
+  function readDrawing(strokes) {
+    if (locked || !strokes.length) return;
+    const r = recognizeNumber(strokes, templates, Math.max(LIMITS.maxResult, LIMITS.maxNumber));
+    if (r.value === null) {
+      lastRead = null;
+      selected = null;
+      feedbackEl.className = 'feedback soft';
+      feedbackEl.textContent = 'Nesupratau 🤔 Parašyk dar kartą';
+    } else {
+      lastRead = { strokes, groups: r.groups, digits: r.digits };
+      selected = r.value;
+      feedbackEl.className = 'feedback';
+      feedbackEl.textContent = '';
+    }
+    updateSlot();
+    markKeys();
+  }
+
+  function clearDrawing() {
+    if (pad) pad.clear();
+    lastRead = null;
+    selected = null;
+    updateSlot();
+    markKeys();
+  }
+
   function drawAnswers() {
+    removePad();
     answersEl.textContent = '';
     const type = inputFor(problem);
     answersEl.className = 'answers answers-' + type;
+    if (type === 'draw') {
+      pad = drawPad({ onPause: readDrawing });
+      const clearBtn = h('button.btn.btn-secondary.draw-clear', { onclick: () => { clearDrawing(); feedbackEl.textContent = ''; } }, 'Trinti 🧽');
+      const check = h('button.btn.btn-primary.key-check', { disabled: true, onclick: () => { if (selected !== null) answer(selected, null); } }, 'Tikrinti ✔');
+      answersEl.append(h('div.draw-area', null, pad.el, h('div.draw-buttons', null, clearBtn, check)));
+      return;
+    }
     if (type === 'choice') {
       const opts = makeChoices(problem, 2, Math.random, limits);
       for (const v of opts) {
@@ -311,7 +363,16 @@ export function render(ctx, params) {
       locked = true;
       const fast = speed && firstTry && (performance.now() - timerStart) <= speed.seconds * 500;
       stopTimer();
-      let stars = speed ? speed.stars : 1;
+      let stars = speed ? speed.stars : isWrite ? WRITE_STARS : 1;
+      if (isWrite) {
+        s.counters.written += 1;
+        // Teisingai perskaitytas atsakymas – geras rašysenos pavyzdys, mokomės iš jo.
+        if (lastRead && lastRead.digits.length === lastRead.groups.length) {
+          lastRead.groups.forEach((g, k) => addSample(s.handwriting.samples, lastRead.digits[k], g));
+          templates = buildTemplates(s.handwriting.samples);
+        }
+        pad?.setEnabled(false);
+      }
       if (fast) { stars += FAST_BONUS; s.counters.fast += 1; }
       const streakBonus = updateStreak(s, firstTry);
       s.counters.correct += 1;
@@ -341,6 +402,8 @@ export function render(ctx, params) {
     ctx.save();
     pulse(problemEl, 'shake', 500);
     if (btn) { btn.classList.add('wrong'); btn.disabled = true; }
+    if (pad) pad.clear();
+    lastRead = null;
     selected = null;
     updateSlot();
     markKeys();
@@ -409,6 +472,7 @@ export function render(ctx, params) {
       : `Atsakymas: ${problem.answer}`;
     mv.react('nod');
     mv.say('Nieko tokio! Kitą kartą pavyks!', 2500);
+    removePad();
     answersEl.textContent = '';
     answersEl.className = 'answers answers-next';
     answersEl.append(h('button.btn.btn-primary.btn-big', { onclick: () => advance(0) }, 'Toliau ➜'));
@@ -440,6 +504,7 @@ export function render(ctx, params) {
       ctx.checkBadges();
     }
     ctx.save();
+    removePad();
     answersEl.textContent = '';
     visualEl.textContent = '';
     labelEl.textContent = '';
@@ -465,6 +530,7 @@ export function render(ctx, params) {
     destroy() {
       for (const t of timers) clearTimeout(t);
       timers.clear();
+      removePad();
       document.querySelectorAll('.float-stars').forEach(f => f.remove());
     },
   };

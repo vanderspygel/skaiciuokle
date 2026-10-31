@@ -5,6 +5,7 @@ import { SPEEDS } from '../config.js';
 import { topBar, screen } from './common.js';
 
 export function render(ctx, { mode }) {
+  if (mode === 'write') return renderWrite(ctx);
   const s = ctx.state;
   const isTest = mode === 'test';
   let speed = s.prefs.lastSpeed || 'turtle';
@@ -69,5 +70,24 @@ export function render(ctx, { mode }) {
       speedRow,
       isTest ? h('button.btn.btn-primary.btn-big.start-btn', { onclick: start }, 'Pradedam! 🚀') : null,
       history));
+  return { el };
+}
+
+// Rašymo režimas: pradėti arba išmokyti padarėlį savo rašysenos.
+function renderWrite(ctx) {
+  const samples = ctx.state.handwriting.samples;
+  const known = Object.keys(samples).filter(d => samples[d].length).length;
+  const start = () => ctx.go(known ? 'quiz' : 'teach', known ? { mode: 'write' } : { next: 'write' });
+
+  const el = screen('setup',
+    topBar(ctx, { title: 'Rašyti' }),
+    h('div.setup-body', null,
+      h('div.write-hero', null, '✍️'),
+      h('p.setup-hint', null, 'Parašyk atsakymą pirštu!'),
+      h('p.hint', null, known
+        ? `Padarėlis jau moka ${known} iš 10 tavo skaitmenų.`
+        : 'Pirmiausia parodyk padarėliui, kaip tu rašai skaičius.'),
+      h('button.btn.btn-primary.btn-big.start-btn', { onclick: start }, known ? 'Pradedam! ✍️' : 'Mokyti padarėlį 🎓'),
+      known ? h('button.btn.btn-secondary.btn-big', { onclick: () => ctx.go('teach', {}) }, 'Mokyti dar kartą 🎓') : null));
   return { el };
 }
