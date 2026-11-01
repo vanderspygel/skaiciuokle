@@ -10,8 +10,22 @@ export const CATEGORIES = [
   { id: 'treats', title: 'Skanėstai', icon: '🍪' },
 ];
 
+// Kaina 0 – nemokami rūbai, kuriuos galima rinktis jau kuriant padarėlį.
 const CLOTHES = [
+  ['outfit-tee', 'Marškinėliai', 0],
+  ['outfit-dress', 'Suknelė', 0],
+  ['outfit-overalls', 'Kombinezonas', 0],
   ['hat-bow', 'Kaspinas', 8],
+  ['outfit-sweater', 'Dryžuotas megztinis', 15],
+  ['outfit-pajamas', 'Pižama', 20],
+  ['outfit-jersey', 'Sporto marškinėliai', 25],
+  ['outfit-tutu', 'Baleto sijonėlis', 35],
+  ['back-cape', 'Superherojaus apsiaustas', 40],
+  ['outfit-tux', 'Smokingas', 45],
+  ['back-bat', 'Šikšnosparnio sparnai', 50],
+  ['outfit-hero', 'Superherojaus kostiumas', 50],
+  ['back-wings', 'Fėjos sparneliai', 70],
+  ['outfit-princess', 'Princesės suknelė', 90],
   ['hat-flower', 'Gėlytė', 10],
   ['glasses-round', 'Akiniai', 12],
   ['bowtie', 'Peteliškė', 12],
@@ -25,7 +39,8 @@ const CLOTHES = [
   ['glasses-star', 'Žvaigždiniai akiniai', 45],
   ['hat-top', 'Cilindras', 60],
   ['hat-crown', 'Karūna', 120],
-].map(([id, name, price]) => ({ id, cat: 'clothes', name, price }));
+].map(([id, name, price]) => ({ id, cat: 'clothes', name, price }))
+  .sort((a, b) => a.price - b.price);
 
 // Baldai ir žaislai kambariui. kind: 'emoji' arba 'rug' (piešiamas CSS).
 const FURNITURE = [

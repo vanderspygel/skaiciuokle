@@ -1,12 +1,12 @@
 import { h, svgEl } from '../ui.js';
 import { monsterSVG, PARTS, PART_ORDER, COLORS, WEAR, availableOptions, randomParts } from '../monster.js';
-import { ITEM_BY_ID } from '../catalog.js';
+import { ITEM_BY_ID, isOwned } from '../catalog.js';
 import { topBar, screen } from './common.js';
 
 const NAMES = ['Bumbulis', 'Pūkis', 'Žirnelis', 'Burbulas', 'Mimi', 'Tošis', 'Kakaris', 'Saulutė', 'Bubu', 'Ūsius', 'Dzinga', 'Pupa', 'Gugis', 'Lola', 'Žybsnis'];
 
 const TAB_ICONS = { body: '🫧', color: '🎨', pattern: '🔵', eyes: '👀', mouth: '👄', top: '🦄', tail: '〰️', feet: '🦶', wear: '🎩' };
-const SLOTS = [['head', 'Kepurė'], ['face', 'Akiniai'], ['neck', 'Kaklui']];
+const SLOTS = [['body', 'Drabužiai'], ['back', 'Ant nugaros'], ['head', 'Kepurė'], ['face', 'Akiniai'], ['neck', 'Kaklui']];
 
 export function render(ctx, { first = false } = {}) {
   const s = ctx.state;
@@ -15,8 +15,9 @@ export function render(ctx, { first = false } = {}) {
     : { name: '', parts: randomParts(s.owned), wear: {} };
   draft.wear = draft.wear || {};
 
-  const ownedWear = Object.keys(WEAR).filter(id => s.owned.includes(id));
-  const tabs = [...PART_ORDER, ...(ownedWear.length ? ['wear'] : [])];
+  // Nemokami rūbai (kaina 0) rodomi visada, kiti – kai nupirkti.
+  const ownedWear = Object.keys(WEAR).filter(id => ITEM_BY_ID[id] && isOwned(s, ITEM_BY_ID[id]));
+  const tabs = [...PART_ORDER, 'wear'];
   let tab = tabs[0];
 
   const preview = h('div.create-preview');

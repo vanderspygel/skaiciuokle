@@ -113,6 +113,6 @@ Smulkūs sprendimai, priimti kuriant:
 - **Baldai ir skanėstai** piešiami sisteminiais emoji (iPad'e jie gražūs ir veikia be interneto), kilimai, tapetai ir grindys – CSS. Padarėlis ir drabužiai – originalūs SVG.
 - **Kūrimo ekrane** padarėlis rodomas užaugęs („toks išsiris“), o pradžioje jis yra kiaušinis jo spalvos dėmėmis. Parduotuvėje drabužių peržiūra visada rodo užaugusį padarėlį.
 - **Pirkiniai:** nupirkti drabužiai ir kūno dalys iš karto užsidedami; baldai atsiranda kambaryje atsitiktinėje vietoje. Kiekvieną baldą galima turėti vieną. Skanėstai „suvalgomi“ iš karto (animacija), jų galima pirkti kiek nori.
-- **Padarėlio išvaizdą** galima keisti bet kada (✏️ pagrindiniame ekrane), ten pat skiltis „Rūbai“ nupirktiems drabužiams.
+- **Padarėlio išvaizdą** galima keisti bet kada (✏️ pagrindiniame ekrane), ten pat skiltis „Rūbai“. Marškinėliai, suknelė ir kombinezonas nemokami (galima aprengti jau kuriant), kiti drabužiai, apsiaustas ir sparnai perkami parduotuvėje. Drabužiai apkerpami pagal kūno formą, todėl tinka visiems kūnams; vienu metu – po vieną daiktą kiekvienoje vietoje (drabužis, nugara, kepurė, akiniai, kaklas).
 - **Šriftas:** sisteminis apvalus (`ui-rounded` – iPad'e SF Pro Rounded) su visomis lietuviškomis raidėmis.
 - **Priartinimas:** išjungtas dvigubas bakstelėjimas (`touch-action: manipulation`) ir gestų priartinimas, teksto žymėjimas išjungtas visur, išskyrus vardo laukelį.

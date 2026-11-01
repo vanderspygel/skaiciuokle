@@ -123,7 +123,28 @@ const FEET = {
 
 // ---------- Drabužiai ir aksesuarai ----------
 
+// Rūbų viršus su apvalia apykakle; apkerpama pagal kūną, todėl tinka bet kokiai formai.
+const SHIRT = 'M0,150 H70 Q100,172 130,150 H200 V230 H0Z';
+const COLLAR = 'M70,150 Q100,172 130,150';
+const shirt = (fill, edge) => `<path d="${SHIRT}" fill="${fill}"/><path d="${COLLAR}" fill="none" stroke="${edge}" stroke-width="5" stroke-linecap="round"/>`;
+
 export const WEAR = {
+  // Drabužiai ant kūno (slot: body) – apkerpami pagal kūno formą.
+  'outfit-tee': { slot: 'body', svg: () => shirt('#ff6b6b', '#d94545') + heart(100, 184, 7, '#fff') },
+  'outfit-dress': { slot: 'body', svg: () => shirt('#ff9ecb', '#e0508f') + `<rect x="0" y="176" width="200" height="6" fill="#e0508f"/><path d="M0,182 H200 V230 H0Z" fill="#ff7eb6"/>${[[60, 192], [84, 200], [108, 194], [132, 200], [150, 190], [72, 210], [120, 212]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.5" fill="#fff" opacity=".8"/>`).join('')}<path d="M100,179 L90,173 L90,185Z M100,179 L110,173 L110,185Z" fill="#c9305e"/>` },
+  'outfit-overalls': { slot: 'body', svg: () => `<path d="M0,172 H200 V230 H0Z M80,152 H120 V172 H80Z" fill="#5aa9ff"/><path d="M84,154 L64,138 M116,154 L136,138" stroke="#2f7bd6" stroke-width="7" stroke-linecap="round"/><circle cx="86" cy="157" r="3.5" fill="#ffd23f"/><circle cx="114" cy="157" r="3.5" fill="#ffd23f"/><rect x="90" y="176" width="20" height="12" rx="3" fill="none" stroke="#2f7bd6" stroke-width="2.5"/>` },
+  'outfit-sweater': { slot: 'body', svg: () => shirt('#ffd23f', '#e0a800') + `<rect x="0" y="172" width="200" height="8" fill="#7ed957"/><rect x="0" y="188" width="200" height="8" fill="#7ed957"/><rect x="0" y="204" width="200" height="8" fill="#7ed957"/>` },
+  'outfit-pajamas': { slot: 'body', svg: () => shirt('#c9e3ff', '#5aa9ff') + [[66, 180, 6], [134, 176, 5], [104, 196, 6], [150, 196, 5], [52, 198, 4]].map(([x, y, r]) => star(x, y, r, '#ffd23f')).join('') + `<path d="M120,190 a8,8 0 1,0 6,12 a6,6 0 1,1 -6,-12Z" fill="#fff3b0"/>` },
+  'outfit-jersey': { slot: 'body', svg: () => shirt('#4fa82f', '#fff') + `<text x="100" y="185" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="900" fill="#fff">10</text>` },
+  'outfit-tutu': { slot: 'body', svg: () => shirt('#ffc2dd', '#ff7eb6'), extra: () => `<ellipse cx="100" cy="180" rx="66" ry="13" fill="#ffd6e8" stroke="#ff7eb6" stroke-width="3"/><ellipse cx="100" cy="176" rx="54" ry="8" fill="#ffc2dd"/>${[52, 70, 88, 106, 124, 142].map(x => `<circle cx="${x + 3}" cy="${183 + (x % 3)}" r="2.5" fill="#fff"/>`).join('')}` },
+  'outfit-tux': { slot: 'body', svg: () => `<path d="${SHIRT}" fill="#2b2340"/><path d="M76,152 L100,200 L124,152 Q100,170 76,152Z" fill="#fff"/>${[176, 186, 196].map(y => `<circle cx="100" cy="${y}" r="2.5" fill="#2b2340"/>`).join('')}` },
+  'outfit-hero': { slot: 'body', svg: () => shirt('#2f7bd6', '#ffd23f') + `<circle cx="100" cy="184" r="13" fill="#ffd23f"/>${star(100, 184, 10, '#ff4f4f')}<rect x="0" y="200" width="200" height="7" fill="#ff4f4f"/>` },
+  'outfit-princess': { slot: 'body', svg: () => shirt('#b28dff', '#ffcc33') + `<rect x="0" y="178" width="200" height="5" fill="#ffcc33"/><path d="M0,183 H200 V230 H0Z" fill="#9b7bff"/><path d="M0,198 Q12,190 24,198 T48,198 T72,198 T96,198 T120,198 T144,198 T168,198 T192,198 T216,198" fill="none" stroke="#ffcc33" stroke-width="3"/><path d="M100,166 l6,7 l-6,7 l-6,-7Z" fill="#5ad0ff" stroke="#fff" stroke-width="1.5"/>` },
+  // Ant nugaros (slot: back) – piešiama už kūno.
+  'back-cape': { slot: 'back', svg: () => `<path d="M66,138 Q30,182 26,214 Q100,202 174,214 Q170,182 134,138Z" fill="#ff4f4f" stroke="#c23b3b" stroke-width="3" stroke-linejoin="round"/>` },
+  'back-wings': { slot: 'back', svg: () => mirror(`<ellipse cx="40" cy="100" rx="32" ry="20" transform="rotate(-30 40 100)" fill="#c9f0ff" fill-opacity=".9" stroke="#7fc8e8" stroke-width="3"/><ellipse cx="44" cy="142" rx="22" ry="13" transform="rotate(25 44 142)" fill="#ffd0e5" fill-opacity=".9" stroke="#ff9ecb" stroke-width="3"/>`) },
+  'back-bat': { slot: 'back', svg: () => mirror(`<path d="M64,118 L14,88 L22,110 L6,120 L24,132 L12,150 L60,148Z" fill="#3d3a7a" stroke="#26235a" stroke-width="3" stroke-linejoin="round"/>`) },
+
   // Kepurės (slot: head) – pritvirtinamos prie kūno viršaus t.
   'hat-party': { slot: 'head', svg: t => `<path d="M80,${t + 10} L100,${t - 46} L120,${t + 10}Z" fill="#5aa9ff" stroke="#2f7bd6" stroke-width="3" stroke-linejoin="round"/><path d="M87,${t - 8} L113,${t - 8} M93,${t - 26} L107,${t - 26}" stroke="#ffd23f" stroke-width="5"/><circle cx="100" cy="${t - 48}" r="8" fill="#ff7eb6"/>` },
   'hat-cap': { slot: 'head', svg: t => `<path d="M64,${t + 14} Q64,${t - 26} 100,${t - 26} Q136,${t - 26} 136,${t + 14}Z" fill="#ff6b6b" stroke="#d94545" stroke-width="3"/><path d="M118,${t + 10} Q150,${t + 2} 160,${t + 16} L118,${t + 18}Z" fill="#d94545"/><circle cx="100" cy="${t - 26}" r="5" fill="#d94545"/>` },
@@ -212,6 +233,7 @@ export function monsterSVG(monster, opts = {}) {
   const wear = monster.wear || {};
   const w = slot => (wear[slot] && WEAR[wear[slot]]) || null;
   const neck = w('neck');
+  const outfit = w('body');
   const scale = opts.scale ?? 1;
   const floatFeet = parts.feet === 'float';
 
@@ -221,6 +243,7 @@ export function monsterSVG(monster, opts = {}) {
 <g transform="translate(100 216) scale(${scale}) translate(-100 -216)">
 <g class="mon-move${floatFeet ? ' mon-float' : ''}">
 <g class="mon-breathe">
+${w('back') ? w('back').svg() : ''}
 ${TAILS[parts.tail]?.svg(c) || ''}
 ${FEET[parts.feet]?.svg(c) || ''}
 ${TOPS[parts.top]?.svg(c, t) || ''}
@@ -228,8 +251,10 @@ ${TOPS[parts.top]?.svg(c, t) || ''}
 <g clip-path="url(#${id}c)">
 ${PATTERNS[parts.pattern]?.svg(c0) || ''}
 <ellipse cx="70" cy="86" rx="22" ry="14" fill="#fff" opacity=".25" transform="rotate(-25 70 86)"/>
+${outfit ? outfit.svg() : ''}
 ${neck && neck.clip ? neck.svg() : ''}
 </g>
+${outfit ? `<path d="${body.d}" fill="none" stroke="${c0.dark}" stroke-width="4"/>${outfit.extra ? outfit.extra() : ''}` : ''}
 ${neck ? (neck.clip ? neck.extra() : neck.svg()) : ''}
 <circle cx="58" cy="132" r="9" fill="${PINK}" opacity=".55"/><circle cx="142" cy="132" r="9" fill="${PINK}" opacity=".55"/>
 <g class="mon-eyes">${EYES[parts.eyes]?.svg() || ''}</g>
