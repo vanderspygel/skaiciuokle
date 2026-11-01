@@ -203,8 +203,8 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .tile-icon { font-size: 34px; }
 
 /* ===== Kūrimas ===== */
-.create-layout { flex: 1; display: grid; grid-template-columns: minmax(260px, 40%) 1fr; gap: 20px; min-height: 0; }
-.create-left { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.create-layout { flex: 1 0 auto; display: grid; grid-template-columns: minmax(260px, 40%) 1fr; gap: 20px; align-items: start; }
+.create-left { position: sticky; top: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .create-preview { width: 100%; max-width: 360px; aspect-ratio: 200 / 230; }
 .create-preview svg { width: 100%; height: 100%; overflow: visible; }
 .create-preview svg.m-spin { animation: m-spin .9s ease; }
@@ -215,7 +215,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 }
 .name-input:focus { outline: none; border-color: var(--primary); }
 .hint { color: var(--muted); font-size: 20px; font-weight: 700; text-align: center; }
-.create-right { display: flex; flex-direction: column; min-height: 0; }
+.create-right { display: flex; flex-direction: column; }
 
 .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; flex-shrink: 0; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
@@ -228,7 +228,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .tab-icon { font-size: 28px; line-height: 1; }
 .tab.active { background: var(--primary); color: #fff; border-color: var(--primary-dark); }
 
-.option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; overflow-y: auto; padding: 4px 2px 12px; align-content: start; }
+.option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); grid-auto-rows: max-content; gap: 12px; padding: 4px 2px 12px; align-content: start; flex-shrink: 0; }
 .option {
   aspect-ratio: 1; background: #fff; border: 4px solid var(--line); border-radius: 22px; padding: 6px;
   display: grid; place-items: center; cursor: pointer; min-height: 96px;
@@ -411,11 +411,13 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .results-buttons { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
 
 /* ===== Parduotuvė ===== */
-.shop-layout { flex: 1; display: grid; grid-template-columns: 240px 1fr; gap: 16px; min-height: 0; }
-.shop-side { display: flex; align-items: center; justify-content: center; }
+/* Visas ekranas slenka kartu: iPad Safari blogai skaičiuoja tinklelio eilučių aukštį,
+   kai tinklelis yra atskira slenkanti dėžė suspaustoje flex juostoje. */
+.shop-layout { flex: 1 0 auto; display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
+.shop-side { position: sticky; top: 0; display: flex; align-items: center; justify-content: center; min-height: 300px; }
 .shop-monster { width: 220px; height: 260px; }
-.shop-main { display: flex; flex-direction: column; min-height: 0; }
-.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; overflow-y: auto; padding: 4px 2px 16px; align-content: start; }
+.shop-main { display: flex; flex-direction: column; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); grid-auto-rows: max-content; gap: 14px; padding: 4px 2px 16px; align-content: start; flex-shrink: 0; }
 .shop-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; border-radius: 24px; }
 .shop-card.owned { background: #f3fbf5; border-color: #bfe8cf; }
 .shop-card.active { border-color: var(--good); }
@@ -540,7 +542,8 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 @media (orientation: portrait) {
   .create-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .create-preview { max-width: 240px; }
-  .shop-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .shop-layout { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+  .shop-side, .create-left { position: static; min-height: 0; }
   .shop-monster { width: 150px; height: 170px; }
   .speed-row { grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .speed-btn { min-height: 150px; padding: 8px 4px; font-size: 20px; }
