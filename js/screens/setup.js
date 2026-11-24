@@ -8,7 +8,7 @@ export function render(ctx, { mode }) {
   if (mode === 'write') return renderWrite(ctx);
   const s = ctx.state;
   const isTest = mode === 'test';
-  // Pašalintas greitis (pvz., senas 🐢 40 s) → lėčiausias likęs.
+  // Pašalintas greitis (seni 🐢 40 s, 🐇 30 s) → lėčiausias likęs.
   let speed = SPEEDS.some(x => x.id === s.prefs.lastSpeed) ? s.prefs.lastSpeed : SPEEDS[0].id;
   let count = s.prefs.lastTestCount || 10;
   let input = s.prefs.lastInput || 'pad';
@@ -76,7 +76,7 @@ export function render(ctx, { mode }) {
         return h('div.history-item', null,
           h('div.history-stars', null, '⭐'.repeat(t.rating) || '💪'),
           h('div.history-score', null, `${t.ok}/${t.n}`),
-          h('div.history-meta', null, `${sp ? sp.emoji : t.speed === 'turtle' ? '🐢' : ''} ${t.date.slice(5).replace('-', '.')}`));
+          h('div.history-meta', null, `${sp ? sp.emoji : { turtle: '🐢', rabbit: '🐇' }[t.speed] || ''} ${t.date.slice(5).replace('-', '.')}`));
       })));
   }
 

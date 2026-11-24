@@ -20,7 +20,7 @@ export function defaultState() {
     days: { last: null, streak: 0, best: 0, total: 0 },
     tests: [],
     badges: {},
-    prefs: { lastSpeed: 'rabbit', lastTestCount: 10, lastInput: 'pad' },
+    prefs: { lastSpeed: 'fox', lastTestCount: 10, lastInput: 'pad' },
   };
 }
 

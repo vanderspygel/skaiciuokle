@@ -23,7 +23,6 @@ export const UNLOCK_ACCURACY = 0.8;
 
 // Laiko lygiai (sekundės vienam veiksmui).
 export const SPEEDS = [
-  { id: 'rabbit', name: 'Kiškis', emoji: '🐇', seconds: 30, stars: 2 },
   { id: 'fox', name: 'Lapė', emoji: '🦊', seconds: 20, stars: 3 },
   { id: 'horse', name: 'Žirgas', emoji: '🐎', seconds: 15, stars: 3 },
   { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 10, stars: 3 },
