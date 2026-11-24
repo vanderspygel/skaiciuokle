@@ -6,8 +6,11 @@ import { GAMES, speedEmoji } from '../config.js';
 import { gameProgress, levelProgress, accuracy } from '../rewards.js';
 import {
   summarize, byGroup, weakFacts, slowFacts, factGrid, factGrid20, cellLevel, recentTests,
-  secondsText, percentText,
+  secondsText, percentText, starDays, shopProgress,
 } from '../parent.js';
+import { ITEMS } from '../catalog.js';
+import { SKILLS, questFor, QUEST_BY_ID } from '../economy.js';
+import { dateKey } from '../rewards.js';
 import { topBar, screen } from './common.js';
 
 const section = (title, hint, ...body) =>
@@ -90,6 +93,29 @@ function testsList(s) {
   }));
 }
 
+// Žvaigždutės: kiek uždirbama per dieną ir kiek parduotuvės jau nupirkta.
+function starsSection(s) {
+  const days = starDays(s.starLog, dateKey(), 14);
+  const max = Math.max(1, ...days.map(d => d.stars));
+  const played = days.filter(d => d.stars > 0);
+  const avg = played.length ? Math.round(played.reduce((a, d) => a + d.stars, 0) / played.length) : 0;
+  const shop = shopProgress(s.owned || [], ITEMS);
+  const left = Math.max(0, shop.total - shop.spent);
+  const q = questFor(s, dateKey());
+  return [
+    h('p.parent-line', null, `Vidutiniškai ${avg} ⭐ per žaistą dieną · dabar turi ${s.stars} ⭐ ir ${s.gems || 0} 💎`),
+    h('p.parent-line', null, `Parduotuvė: nupirkta ${shop.count} iš ${shop.of} (${shop.spent} iš ${shop.total} ⭐)` +
+      (avg ? ` · likusiam reikėtų ~${Math.ceil(left / avg)} dienų` : '')),
+    h('div.parent-tests', null, days.map(d => h('div.parent-test', null,
+      h('div.parent-test-bar', null, h('div.parent-test-fill', { style: { height: Math.round(d.stars / max * 100) + '%' } })),
+      h('div.parent-test-score', null, d.stars || '·'),
+      h('div.parent-test-meta', null, d.date.slice(5).replace('-', '.'))))),
+    h('p.parent-line', null, `Dienos užduotis: ${QUEST_BY_ID[q.id].text} – ${q.done ? 'atlikta ✅' : 'dar ne'}`),
+    h('p.parent-line', null, 'Įgūdžiai (atrakina svajonių prekes ir aukščiausius augimo etapus):'),
+    h('ul.parent-skills', null, Object.values(SKILLS).map(k => h('li', null, `${k.check(s) ? '✅' : '⬜'} ${k.text}`))),
+  ];
+}
+
 export function render(ctx) {
   const s = ctx.state;
   const sum = summarize(s.stats);
@@ -104,6 +130,8 @@ export function render(ctx) {
         h('div.stat', null, h('b', null, `${s.days.streak || 0} / ${s.days.best || 0}`), h('span', null, 'serija dabar / geriausia')),
         h('div.stat', null, h('b', null, sum.n), h('span', null, 'atsakyta užduočių')),
         h('div.stat', null, h('b', null, sum.n ? percentText(sum.accuracy) : '—'), h('span', null, 'iš pirmo karto'))),
+
+      section('Žvaigždutės', 'Tikslas – visą parduotuvę nupirkti per maždaug mėnesį žaidžiant 10–15 min per dieną.', ...starsSection(s)),
 
       section('Pagal užduočių tipą', 'Skaičiuojamas tik pirmas atsakymas į kiekvieną užduotį.',
         groups.length

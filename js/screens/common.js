@@ -10,7 +10,8 @@ export function topBar(ctx, { back = 'home', backParams, title = '', onBack, ext
     backBtn,
     h('div.topbar-title', null, title),
     extra || null,
-    h('div.star-pill', null, h('span', { 'data-stars': '' }, ctx.state.stars), ' ⭐'));
+    h('div.star-pill', null, h('span', { 'data-stars': '' }, ctx.state.stars), ' ⭐',
+      h('span.gem-count', null, ' · ', h('span', { 'data-gems': '' }, ctx.state.gems || 0), ' 💎')));
 }
 
 export function screen(cls, ...children) {

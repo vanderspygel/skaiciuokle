@@ -3,8 +3,8 @@
 
 import {
   LEVELS, GAMES, STAGES, UNLOCK_CORRECT, UNLOCK_WINDOW, UNLOCK_ACCURACY,
-  STREAK_BONUS, STREAK_BONUS_EVERY,
 } from './config.js';
+import { gatedStageIndex, streakBonus } from './economy.js';
 
 export function stageIndex(totalEarned) {
   let idx = 0;
@@ -30,8 +30,21 @@ export function growOf(monster, state) {
   return typeof monster.grow === 'number' ? monster.grow : 0;
 }
 
+// Draugo etapas: pagal augimą, o aukščiausiems – ir pagal įgūdžius (economy.js).
+// Jau pasiektas etapas (monster.reached) niekada neatimamas.
+export function friendStageIndex(monster, state) {
+  return gatedStageIndex(growOf(monster, state), state, (monster && monster.reached) || 0);
+}
+
 export function friendStage(monster, state) {
-  return stageFor(growOf(monster, state));
+  return STAGES[friendStageIndex(monster, state)];
+}
+
+// Aukščiausias etapas tarp visų draugų (nuo jo atsidaro parduotuvės pakopos).
+export function maxStage(s) {
+  const all = allFriends(s);
+  if (!all.length) return gatedStageIndex(s.totalEarned, s, 0);
+  return Math.max(...all.map(f => friendStageIndex(f, s)));
 }
 
 // Padaro kitą draugą aktyviu (su juo žaidžiama, jis auga).
@@ -56,6 +69,7 @@ export function switchFriend(state, uid) {
 export function addFriend(state, friend) {
   friend.uid = friend.uid || 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   friend.grow = friend.grow || 0;
+  friend.reached = friend.reached || 0;
   if (state.monster) {
     // Ankstesnis draugas pasitraukia į šoną, kad kambaryje nesusidėtų vienas ant kito.
     const n = state.friends.length;
@@ -69,15 +83,40 @@ export function addFriend(state, friend) {
 
 // Prideda žvaigždučių. Išleidimas augimo neatima: totalEarned ir monster.grow tik auga.
 // Auga tik aktyvus draugas. Grąžina naują etapą, jei jis paaugo.
-export function addStars(state, n) {
+// Taip pat įrašo dienos žurnalą tėvų ataskaitai (state.starLog).
+export function addStars(state, n, date = dateKey()) {
   if (!n) return null;
   const m = state.monster;
-  const before = stageIndex(growOf(m, state));
+  // Lyginam su paskutiniu „pastebėtu“ etapu – jei ką tik įgytas įgūdis atrakino etapą, irgi švenčiam.
+  const before = m && typeof m.reached === 'number' ? m.reached : friendStageIndex(m, state);
   state.stars += n;
   state.totalEarned += n;
   if (m) m.grow = growOf(m) + n;
-  const after = stageIndex(growOf(m, state));
+  logDay(state, date).stars += n;
+  return checkGrowth(state, before);
+}
+
+// Patikrina, ar aktyvus draugas paaugo (pvz., įgijus įgūdį). Grąžina naują etapą arba null.
+export function checkGrowth(state, before) {
+  const m = state.monster;
+  const after = friendStageIndex(m, state);
+  if (m) m.reached = Math.max(m.reached || 0, after);
   return after > before ? STAGES[after] : null;
+}
+
+export function addGems(state, n, date = dateKey()) {
+  if (!n) return;
+  state.gems = (state.gems || 0) + n;
+  logDay(state, date).gems += n;
+}
+
+function logDay(state, date) {
+  state.starLog = state.starLog || {};
+  const d = state.starLog[date] || (state.starLog[date] = { stars: 0, gems: 0 });
+  d.gems = d.gems || 0;
+  const days = Object.keys(state.starLog).sort();
+  for (const k of days.slice(0, Math.max(0, days.length - 60))) delete state.starLog[k];
+  return d;
 }
 
 export function spendStars(state, n) {
@@ -94,7 +133,7 @@ export function updateStreak(state, correctFirstTry) {
   }
   state.streak += 1;
   if (state.streak > state.counters.bestStreak) state.counters.bestStreak = state.streak;
-  return state.streak % STREAK_BONUS_EVERY === 0 ? STREAK_BONUS : 0;
+  return streakBonus(state.streak);
 }
 
 // ---------- Lygiai ----------
@@ -199,7 +238,7 @@ export const ACHIEVEMENTS = [
   { id: 'friend2', icon: '🤝', name: 'Naujas draugas', desc: 'Susiradai antrą draugą', reward: 5, check: s => allFriends(s).length >= 2 },
   { id: 'friends4', icon: '👫', name: 'Draugų būrys', desc: 'Turi 4 draugus', reward: 15, check: s => allFriends(s).length >= 4 },
   { id: 'friends8', icon: '🎉', name: 'Didelė šeima', desc: 'Turi 8 draugus', reward: 30, check: s => allFriends(s).length >= 8 },
-  { id: 'twoGrown', icon: '🌳', name: 'Du dideli', desc: 'Du draugai užaugo dideli', reward: 20, check: s => allFriends(s).filter(f => stageIndex(growOf(f)) >= stageId('big')).length >= 2 },
+  { id: 'twoGrown', icon: '🌳', name: 'Du dideli', desc: 'Du draugai užaugo dideli', reward: 20, check: s => allFriends(s).filter(f => friendStageIndex(f, s) >= stageId('big')).length >= 2 },
   { id: 'super', icon: '⭐', name: 'Superžvaigždė', desc: 'Draugas tapo superžvaigžde', reward: 25, check: s => maxStage(s) >= stageId('super') },
   { id: 'legend', icon: '👑', name: 'Legenda', desc: 'Draugas tapo legenda', reward: 50, check: s => maxStage(s) >= stageId('legend') },
 ];
@@ -208,11 +247,6 @@ function stageId(id) {
   return STAGES.findIndex(st => st.id === id);
 }
 
-function maxStage(s) {
-  const all = allFriends(s);
-  if (!all.length) return stageIndex(s.totalEarned);
-  return Math.max(...all.map(f => stageIndex(growOf(f))));
-}
 
 // Patikrina pasiekimus; naujiems prideda premiją. Grąžina naujų sąrašą.
 // Premija gali atrakinti kitus pasiekimus (pvz., „Užaugau!“), todėl kartojam.

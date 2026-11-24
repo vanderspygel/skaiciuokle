@@ -138,3 +138,24 @@ export function secondsText(ms) {
 export function percentText(ratio) {
   return `${Math.round(ratio * 100)} %`;
 }
+
+// Žvaigždutės per paskutines dienas (nuo seniausios), dienos be žaidimo – 0.
+export function starDays(starLog, todayKey, days = 14) {
+  const [y, m, d] = todayKey.split('-').map(Number);
+  const out = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const dt = new Date(Date.UTC(y, m - 1, d - i));
+    const key = dt.toISOString().slice(0, 10);
+    const e = (starLog || {})[key] || {};
+    out.push({ date: key, stars: e.stars || 0, gems: e.gems || 0 });
+  }
+  return out;
+}
+
+// Kiek parduotuvės jau nupirkta (be skanėstų ir kartojamų prekių), žvaigždutėmis.
+export function shopProgress(owned, items) {
+  const list = items.filter(i => !i.consumable && i.price > 0);
+  const total = list.reduce((a, i) => a + i.price, 0);
+  const have = list.filter(i => owned.includes(i.id));
+  return { total, spent: have.reduce((a, i) => a + i.price, 0), count: have.length, of: list.length };
+}

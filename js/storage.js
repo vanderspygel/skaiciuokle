@@ -1,5 +1,7 @@
 // Duomenų saugojimas localStorage. Viena versijuota struktūra.
 
+import { stageIndex } from './rewards.js';
+
 const KEY = 'skaiciuokle';
 export const SCHEMA_VERSION = 1;
 
@@ -11,6 +13,7 @@ export function defaultState() {
     friends: [], // kiti draugai (ta pati forma + pos kambaryje)
     stars: 0,
     totalEarned: 0,
+    gems: 0, // deimantai už sunkų darbą (žr. economy.js)
     owned: [],
     room: { wallpaper: 'wall-cream', floor: 'floor-wood', items: [], monster: { x: 50, y: 72 } }, // pirmasis kambarys
     rooms: {}, // kiti kambariai: { kitchen: { wallpaper, floor, items } } (žr. rooms.js)
@@ -23,6 +26,11 @@ export function defaultState() {
     days: { last: null, streak: 0, best: 0, total: 0 },
     tests: [],
     badges: {},
+    records: {}, // geriausi mintinai ir kontrolinių rezultatai įgūdžiams: { 'm:10:horse': 1 }
+    today: { date: null, rounds: {} }, // šiandien sužaisti raundai (kartojimo daugikliui)
+    quest: null, // dienos užduotis: { date, id, n, done }
+    questHistory: [],
+    starLog: {}, // { '2026-11-24': { stars, gems } } – tėvų ataskaitai
     prefs: { lastSpeed: 'fox', lastTestCount: 10, lastInput: 'pad', game: 10 },
   };
 }
@@ -59,6 +67,7 @@ export function migrate(data) {
 
 // Draugų laukai, kurių nebuvo senesnėse versijose (be schemos keitimo).
 // Senas padarėlis paveldi visą augimą (totalEarned), todėl neprapuola nė vienas etapas.
+// reached – jau pasiektas etapas: naujos įgūdžių sąlygos jo neatima.
 function repair(s) {
   if (!Array.isArray(s.friends)) s.friends = [];
   const fix = (m, i) => {
@@ -67,7 +76,18 @@ function repair(s) {
     if (!m.kind) m.kind = 'monster';
     if (!m.uid) m.uid = 'f' + i + Date.now().toString(36);
     if (!m.wear) m.wear = {};
+    if (typeof m.reached !== 'number') m.reached = stageIndex(m.grow);
   };
+  // Geriausi kontrolinių rezultatai iš istorijos (įgūdžiams).
+  if (!s.recordsFromTests) {
+    for (const t of s.tests || []) {
+      if (!t || !t.n || !t.speed) continue;
+      const k = `t:${t.game || 10}:${t.speed}`;
+      const r = t.ok / t.n;
+      if (!(s.records[k] >= r)) s.records[k] = r;
+    }
+    s.recordsFromTests = true;
+  }
   fix(s.monster, 0);
   s.friends = s.friends.filter(f => f && f.parts);
   s.friends.forEach((f, i) => fix(f, i + 1));

@@ -38,7 +38,7 @@ export function render(ctx, { mode }) {
         },
       }, h('span.speed-emoji', null, sp.emoji), h('span', null, sp.name),
         h('span.speed-secs', null, `${sp.seconds} s`),
-        h('span.speed-stars', null, '⭐'.repeat(sp.stars))));
+        h('span.speed-stars', null, `⭐ ×${String(sp.mult).replace('.', ',')}`)));
     }
   }
 
