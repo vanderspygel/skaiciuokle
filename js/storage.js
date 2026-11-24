@@ -1,6 +1,7 @@
 // Duomenų saugojimas localStorage. Viena versijuota struktūra.
 
 import { stageIndex } from './rewards.js';
+import { LATEST_NEWS } from './news.js';
 
 const KEY = 'skaiciuokle';
 export const SCHEMA_VERSION = 1;
@@ -31,6 +32,7 @@ export function defaultState() {
     quest: null, // dienos užduotis: { date, id, n, done }
     questHistory: [],
     starLog: {}, // { '2026-11-24': { stars, gems } } – tėvų ataskaitai
+    newsSeen: LATEST_NEWS ? LATEST_NEWS.id : null, // naujausios matytos naujienos (žr. news.js); naujam žaidėjui – jau matytos
     prefs: { lastSpeed: 'fox', lastTestCount: 10, lastInput: 'pad', game: 10 },
   };
 }
@@ -55,6 +57,8 @@ const MIGRATIONS = {
 export function migrate(data) {
   if (!data || typeof data !== 'object') return defaultState();
   let s = data;
+  // Senesni išsaugojimai naujienų dar nematė – parodysim jas.
+  if (!('newsSeen' in s)) s.newsSeen = null;
   let v = s.schemaVersion || 0;
   while (v < SCHEMA_VERSION) {
     const m = MIGRATIONS[v];
