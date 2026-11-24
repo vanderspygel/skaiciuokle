@@ -65,8 +65,9 @@ Kompiuteryje tą patį galima patikrinti Chrome: DevTools → Application → Se
 
 1. Pakeisk failus.
 2. **Būtinai** `sw.js` faile padidink versiją: `const VERSION = 'v1';` → `'v2'`. Jei pridėjai naują failą – įrašyk jį į `ASSETS` sąrašą.
-3. Įkelk į GitHub (`git commit` + `git push`).
-4. iPad'e atidaryk programėlę, kai yra internetas. Naujoji versija atsisiunčia fone ir po kelių sekundžių programa persikrauna pati (bet ne užduoties viduryje – tada tik grįžus į kitą ekraną). Jei neatsinaujina – visiškai uždaryk programėlę (perbrauk aukštyn programų perjungiklyje) ir vėl atidaryk.
+3. Jei nori, kad vaikas pamatytų, kas naujo: `js/news.js` sąrašo `NEWS` pradžioje pridėk naują įrašą su nauju `id` ir trumpais sakiniais. Po atnaujinimo jis bus parodytas vieną kartą (po „Pirmyn!“ – klausimas „Ar viską perskaitei?“: „Ne“ grąžina į sąrašą, „Taip“ uždaro). Naujam žaidėjui naujienos nerodomos.
+4. Įkelk į GitHub (`git commit` + `git push`).
+5. iPad'e atidaryk programėlę, kai yra internetas. Naujoji versija atsisiunčia fone ir po kelių sekundžių programa persikrauna pati (bet ne užduoties viduryje – tada tik grįžus į kitą ekraną). Jei neatsinaujina – visiškai uždaryk programėlę (perbrauk aukštyn programų perjungiklyje) ir vėl atidaryk.
 
 Vaiko duomenys (žvaigždutės, padarėlis, pasiekimai) atnaujinant **neprarandami**: jie laikomi `localStorage` su `schemaVersion`. Jei keisi duomenų struktūrą – padidink `SCHEMA_VERSION` faile `js/storage.js` ir pridėk migraciją į `MIGRATIONS`.
 

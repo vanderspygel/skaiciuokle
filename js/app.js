@@ -5,6 +5,7 @@ import { addStars, addGems, checkAchievements, markPlayed, dateKey, friendStage 
 import { questEvent, QUEST_STARS, QUEST_GEMS } from './economy.js';
 import { h, toast, confetti, modal } from './ui.js';
 import { monsterView } from './monsterView.js';
+import { newsToShow, markNewsSeen } from './news.js';
 
 import * as home from './screens/home.js';
 import * as create from './screens/create.js';
@@ -120,6 +121,42 @@ const ctx = {
   },
 };
 
+// Naujienos po atnaujinimo: sąrašas → „Pirmyn!“ → „Ar viską perskaitei?“
+// „Ne“ grąžina į sąrašą, „Taip“ uždaro ir žaidžiam. Rodoma vieną kartą.
+ctx.showNews = function showNews(done) {
+  const news = newsToShow(this.state);
+  if (!news) { done && done(); return false; }
+  let close;
+  const box = h('div.news');
+  const list = () => {
+    box.replaceChildren(
+      h('div.news-title', null, '🎉 ', news.title),
+      h('ul.news-list', null, news.items.map(it => h('li.news-item', null,
+        h('span.news-icon', { 'aria-hidden': 'true' }, it.icon),
+        h('div', null, h('b.news-item-title', null, it.title), ' ', h('span', null, it.text))))),
+      h('button.btn.btn-primary.btn-big.news-go', { onclick: ask }, 'Pirmyn!'));
+    const scroller = box.closest('.modal-box');
+    if (scroller) scroller.scrollTop = 0;
+  };
+  const ask = () => {
+    box.replaceChildren(
+      h('div.news-ask', null, 'Ar viską perskaitei?'),
+      h('div.news-answers', null,
+        h('button.btn.btn-primary.btn-big', { onclick: () => {
+          markNewsSeen(this.state);
+          this.save();
+          close();
+          confetti(30);
+        } }, 'Taip 👍'),
+        h('button.btn.btn-secondary.btn-big', { onclick: list }, 'Ne')));
+    const scroller = box.closest('.modal-box');
+    if (scroller) scroller.scrollTop = 0;
+  };
+  list();
+  close = modal(box, { className: 'modal-news', onClose: done });
+  return true;
+};
+
 // Grįžimo pasisveikinimas: padarėlis tiesiog džiaugiasi.
 ctx.lastVisitDay = ctx.state.days.last;
 
@@ -128,6 +165,7 @@ window.__ctx = ctx; // derinimui
 function start() {
   requestPersist();
   ctx.go(ctx.state.monster ? 'home' : 'create', { first: !ctx.state.monster });
+  ctx.showNews();
 }
 
 // Neleidžiam dvigubo bakstelėjimo priartinimo ir gestų priartinimo iOS.
