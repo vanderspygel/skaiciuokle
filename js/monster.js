@@ -21,6 +21,11 @@ export const COLORS = {
   coral: { name: 'Koralinė', main: '#ff6b6b', dark: '#d94545', light: '#ffd0d0' },
   night: { name: 'Naktinė', main: '#3d3a7a', dark: '#26235a', light: '#8c87d9' },
   gold: { name: 'Auksinė', main: '#ffcc33', dark: '#d99a00', light: '#fff0b0', grad: ['#fff2a8', '#ffcc33', '#e8a300'] },
+  skinLight: { name: 'Šviesi oda', main: '#ffd9bf', dark: '#e0a27c', light: '#fff0e4' },
+  skinTan: { name: 'Įdegusi oda', main: '#e8b083', dark: '#b97a4f', light: '#f8dcc4' },
+  skinBrown: { name: 'Ruda oda', main: '#a86b45', dark: '#7a4628', light: '#d9a882' },
+  lilac: { name: 'Alyvinė', main: '#c9a7ff', dark: '#9572d9', light: '#eee2ff' },
+  mint: { name: 'Mėtinė', main: '#8ff0c8', dark: '#3fbf8f', light: '#dcfff0' },
   rainbow: { name: 'Vaivorykštė', main: '#ff9f45', dark: '#9b7bff', light: '#fff1b8', grad: ['#ff7eb6', '#ffd23f', '#7ed957', '#5aa9ff', '#9b7bff'] },
 };
 
@@ -97,6 +102,11 @@ const TOPS = {
   bunny: { name: 'Kiškio ausys', svg: (c, t) => mirror(`<ellipse cx="78" cy="${t - 22}" rx="13" ry="38" transform="rotate(-14 78 ${t - 22})" fill="${c.main}" stroke="${c.dark}" stroke-width="3"/><ellipse cx="78" cy="${t - 20}" rx="6" ry="26" transform="rotate(-14 78 ${t - 20})" fill="${PINK}"/>`) },
   unicorn: { name: 'Stebuklingas ragas', svg: (c, t) => `<path d="M90,${t + 10} L100,${t - 42} L110,${t + 10}Z" fill="#ffe680" stroke="#e0a800" stroke-width="3" stroke-linejoin="round"/><path d="M93,${t - 2} L107,${t - 8} M95,${t - 16} L105,${t - 21}" stroke="#e0a800" stroke-width="2.5"/>` },
   sprout: { name: 'Daigelis', svg: (c, t) => `<path d="M100,${t + 8} Q98,${t - 14} 100,${t - 24}" fill="none" stroke="#4fa82f" stroke-width="4" stroke-linecap="round"/><path d="M100,${t - 22} Q84,${t - 40} 72,${t - 26} Q86,${t - 16} 100,${t - 22}Z M100,${t - 22} Q116,${t - 42} 130,${t - 30} Q116,${t - 16} 100,${t - 22}Z" fill="#7ed957" stroke="#4fa82f" stroke-width="2.5"/>` },
+  dogEars: { name: 'Šuniuko ausys', svg: c => mirror(`<path d="M60,84 Q34,82 30,118 Q30,146 46,150 Q58,134 66,100Z" fill="${c.dark}" stroke="${c.dark}" stroke-width="3" stroke-linejoin="round"/>`), front: c => mirror(`<path d="M62,82 Q38,80 34,116 Q34,142 48,146 Q58,130 66,98Z" fill="${c.dark}"/>`) },
+  // Plaukai (žmogeliukams): dalis už galvos, kirpčiukai – ant kūno (front, apkerpama).
+  hairShort: { name: 'Trumpi plaukai', svg: (c, t) => `<path d="M58,${t + 26} Q56,${t - 14} 100,${t - 14} Q144,${t - 14} 142,${t + 26}Z" fill="#7a4a2a"/>`, front: (c, t) => `<path d="M0,0 H200 V${t + 22} Q170,${t + 30} 150,${t + 18} Q126,${t + 36} 100,${t + 22} Q76,${t + 36} 50,${t + 18} Q30,${t + 30} 0,${t + 22}Z" fill="#7a4a2a"/>` },
+  hairPigtails: { name: 'Kasytės', svg: (c, t) => mirror(`<circle cx="40" cy="${t + 34}" r="20" fill="#f2c14e" stroke="#d19a1f" stroke-width="3"/><circle cx="54" cy="${t + 26}" r="7" fill="#ff4f81"/>`), front: (c, t) => `<path d="M0,0 H200 V${t + 20} Q150,${t + 32} 104,${t + 16} Q70,${t + 34} 0,${t + 20}Z" fill="#f2c14e"/>` },
+  hairCurly: { name: 'Garbanos', svg: (c, t) => [[56, t + 18], [70, t - 2], [90, t - 12], [110, t - 12], [130, t - 2], [144, t + 18], [48, t + 40], [152, t + 40]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="17" fill="#2b2340"/>`).join(''), front: (c, t) => `<path d="M0,0 H200 V${t + 22} ${[180, 160, 140, 120, 100, 80, 60, 40, 20, 0].map((x, i) => `Q${x + 10},${t + (i % 2 ? 22 : 36)} ${x},${t + 22}`).join(' ')}Z" fill="#2b2340"/>` },
   crest: { name: 'Skiauterė', svg: (c, t) => `<path d="M76,${t + 14} L80,${t - 16} L92,${t + 4} L100,${t - 26} L108,${t + 4} L120,${t - 16} L124,${t + 14}Z" fill="${c.dark}" stroke="${c.dark}" stroke-width="3" stroke-linejoin="round"/>` },
 };
 
@@ -140,10 +150,18 @@ export const WEAR = {
   'outfit-tux': { slot: 'body', svg: () => `<path d="${SHIRT}" fill="#2b2340"/><path d="M76,152 L100,200 L124,152 Q100,170 76,152Z" fill="#fff"/>${[176, 186, 196].map(y => `<circle cx="100" cy="${y}" r="2.5" fill="#2b2340"/>`).join('')}` },
   'outfit-hero': { slot: 'body', svg: () => shirt('#2f7bd6', '#ffd23f') + `<circle cx="100" cy="184" r="13" fill="#ffd23f"/>${star(100, 184, 10, '#ff4f4f')}<rect x="0" y="200" width="200" height="7" fill="#ff4f4f"/>` },
   'outfit-princess': { slot: 'body', svg: () => shirt('#b28dff', '#ffcc33') + `<rect x="0" y="178" width="200" height="5" fill="#ffcc33"/><path d="M0,183 H200 V230 H0Z" fill="#9b7bff"/><path d="M0,198 Q12,190 24,198 T48,198 T72,198 T96,198 T120,198 T144,198 T168,198 T192,198 T216,198" fill="none" stroke="#ffcc33" stroke-width="3"/><path d="M100,166 l6,7 l-6,7 l-6,-7Z" fill="#5ad0ff" stroke="#fff" stroke-width="1.5"/>` },
+  'outfit-raincoat': { slot: 'body', svg: () => shirt('#ffd23f', '#e0a800') + `<path d="M100,160 V230" stroke="#e0a800" stroke-width="3"/>${[176, 192, 208].map(y => `<circle cx="108" cy="${y}" r="3" fill="#e0a800"/>`).join('')}<rect x="122" y="190" width="22" height="12" rx="3" fill="none" stroke="#e0a800" stroke-width="2.5"/>` },
+  'outfit-astronaut': { slot: 'body', svg: () => shirt('#f4f6fb', '#9aa6c0') + `<rect x="82" y="174" width="36" height="24" rx="5" fill="#d9e0ef" stroke="#9aa6c0" stroke-width="2"/><circle cx="92" cy="186" r="4" fill="#ff4f4f"/><circle cx="104" cy="186" r="4" fill="#5aa9ff"/><rect x="0" y="206" width="200" height="6" fill="#ff9f45"/>` },
+  'outfit-chef': { slot: 'body', svg: () => shirt('#ffffff', '#d9d9e6') + `${[[88, 176], [112, 176], [88, 194], [112, 194]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.5" fill="#2b2340"/>`).join('')}<path d="M0,200 H200 V230 H0Z" fill="#ff6b6b" opacity=".85"/>` },
+  'outfit-sailor': { slot: 'body', svg: () => shirt('#ffffff', '#2f7bd6') + `<path d="M70,150 L100,182 L130,150 Z" fill="#2f7bd6"/><path d="M76,152 L100,176 L124,152" fill="none" stroke="#fff" stroke-width="2.5"/>${[188, 202, 216].map(y => `<rect x="0" y="${y}" width="200" height="5" fill="#5aa9ff"/>`).join('')}<path d="M100,182 l-7,10 h14Z" fill="#ff4f4f"/>` },
+  'outfit-dino': { slot: 'body', svg: () => shirt('#7ed957', '#4fa82f') + `<ellipse cx="100" cy="196" rx="30" ry="22" fill="#d4f5c4"/>${[60, 84, 116, 140].map(x => `<path d="M${x - 6},152 l6,-10 l6,10Z" fill="#ff9f45"/>`).join('')}` },
   // Ant nugaros (slot: back) – piešiama už kūno.
   'back-cape': { slot: 'back', svg: () => `<path d="M66,138 Q30,182 26,214 Q100,202 174,214 Q170,182 134,138Z" fill="#ff4f4f" stroke="#c23b3b" stroke-width="3" stroke-linejoin="round"/>` },
   'back-wings': { slot: 'back', svg: () => mirror(`<ellipse cx="40" cy="100" rx="32" ry="20" transform="rotate(-30 40 100)" fill="#c9f0ff" fill-opacity=".9" stroke="#7fc8e8" stroke-width="3"/><ellipse cx="44" cy="142" rx="22" ry="13" transform="rotate(25 44 142)" fill="#ffd0e5" fill-opacity=".9" stroke="#ff9ecb" stroke-width="3"/>`) },
   'back-bat': { slot: 'back', svg: () => mirror(`<path d="M64,118 L14,88 L22,110 L6,120 L24,132 L12,150 L60,148Z" fill="#3d3a7a" stroke="#26235a" stroke-width="3" stroke-linejoin="round"/>`) },
+  'back-backpack': { slot: 'back', svg: () => `<rect x="124" y="118" width="54" height="64" rx="14" fill="#ff7eb6" stroke="#e0508f" stroke-width="3"/><rect x="132" y="150" width="38" height="22" rx="6" fill="#ffd0e5" stroke="#e0508f" stroke-width="2"/>` },
+  'back-balloon': { slot: 'back', svg: () => `<path d="M150,150 Q172,110 168,60" fill="none" stroke="#888" stroke-width="2"/><ellipse cx="168" cy="40" rx="20" ry="24" fill="#ff4f81" stroke="#c9305e" stroke-width="3"/><path d="M164,64 l4,-4 l4,4Z" fill="#c9305e"/><ellipse cx="160" cy="32" rx="5" ry="8" fill="#fff" opacity=".5"/>` },
+  'back-rocket': { slot: 'back', svg: () => mirror(`<rect x="34" y="104" width="26" height="62" rx="12" fill="#c9d3e6" stroke="#7d8aa6" stroke-width="3"/><path d="M38,166 L47,190 L56,166Z" fill="#ffb02e" stroke="#ff7a00" stroke-width="2.5" stroke-linejoin="round"/><path d="M36,112 L47,92 L58,112Z" fill="#ff4f4f" stroke="#c23b3b" stroke-width="2.5" stroke-linejoin="round"/>`) },
 
   // Kepurės (slot: head) – pritvirtinamos prie kūno viršaus t.
   'hat-party': { slot: 'head', svg: t => `<path d="M80,${t + 10} L100,${t - 46} L120,${t + 10}Z" fill="#5aa9ff" stroke="#2f7bd6" stroke-width="3" stroke-linejoin="round"/><path d="M87,${t - 8} L113,${t - 8} M93,${t - 26} L107,${t - 26}" stroke="#ffd23f" stroke-width="5"/><circle cx="100" cy="${t - 48}" r="8" fill="#ff7eb6"/>` },
@@ -162,6 +180,14 @@ export const WEAR = {
   'bowtie': { slot: 'neck', svg: () => `<path d="M100,166 L80,154 L80,178Z M100,166 L120,154 L120,178Z" fill="#5aa9ff" stroke="#2f7bd6" stroke-width="3" stroke-linejoin="round"/><circle cx="100" cy="166" r="6" fill="#2f7bd6"/>` },
   'necklace': { slot: 'neck', svg: () => `<path d="M66,150 Q100,182 134,150" fill="none" stroke="#ffcc33" stroke-width="3"/>${[[74, 160], [86, 168], [100, 172], [114, 168], [126, 160]].map(([x, y], i) => `<circle cx="${x}" cy="${y}" r="5" fill="${['#ff7eb6', '#5aa9ff', '#ffd23f', '#7ed957', '#9b7bff'][i]}"/>`).join('')}` },
   'medal': { slot: 'neck', svg: () => `<path d="M84,146 L100,172 L116,146" fill="none" stroke="#5aa9ff" stroke-width="7"/><circle cx="100" cy="176" r="12" fill="#ffcc33" stroke="#d99a00" stroke-width="3"/>${star(100, 176, 7, '#fff3b0')}` },
+  'hat-wizard': { slot: 'head', svg: t => `<path d="M62,${t + 12} L106,${t - 56} L138,${t + 12}Z" fill="#6d4fd6" stroke="#3d2a9a" stroke-width="3" stroke-linejoin="round"/><rect x="54" y="${t + 4}" width="92" height="12" rx="6" fill="#3d2a9a"/>${star(96, t - 18, 7, '#ffd23f')}${star(116, t - 2, 5, '#ffd23f')}<circle cx="86" cy="${t - 2}" r="3" fill="#fff"/>` },
+  'hat-pirate': { slot: 'head', svg: t => `<path d="M52,${t + 14} Q60,${t - 30} 100,${t - 30} Q140,${t - 30} 148,${t + 14} Q100,${t + 2} 52,${t + 14}Z" fill="#2b2340" stroke="#111" stroke-width="3" stroke-linejoin="round"/><circle cx="100" cy="${t - 10}" r="8" fill="#fff"/><circle cx="97" cy="${t - 11}" r="1.8" fill="#2b2340"/><circle cx="103" cy="${t - 11}" r="1.8" fill="#2b2340"/><path d="M90,${t + 2} L110,${t - 4} M90,${t - 4} L110,${t + 2}" stroke="#fff" stroke-width="2.5"/>` },
+  'hat-headphones': { slot: 'head', svg: t => `<path d="M48,${t + 50} Q48,${t - 18} 100,${t - 18} Q152,${t - 18} 152,${t + 50}" fill="none" stroke="#2b2340" stroke-width="8" stroke-linecap="round"/><rect x="34" y="${t + 36}" width="24" height="36" rx="10" fill="#ff4f81" stroke="#2b2340" stroke-width="3"/><rect x="142" y="${t + 36}" width="24" height="36" rx="10" fill="#ff4f81" stroke="#2b2340" stroke-width="3"/>` },
+  'hat-chef': { slot: 'head', svg: t => `<rect x="70" y="${t - 4}" width="60" height="16" rx="3" fill="#fff" stroke="#c9c9d6" stroke-width="3"/><path d="M72,${t - 2} Q56,${t - 26} 78,${t - 34} Q84,${t - 56} 100,${t - 44} Q116,${t - 56} 122,${t - 34} Q144,${t - 26} 128,${t - 2}Z" fill="#fff" stroke="#c9c9d6" stroke-width="3" stroke-linejoin="round"/>` },
+  'hat-flowercrown': { slot: 'head', svg: t => `<path d="M62,${t + 12} Q100,${t - 6} 138,${t + 12}" fill="none" stroke="#4fa82f" stroke-width="5" stroke-linecap="round"/>${[[66, 10, '#ff9ecb'], [82, 3, '#ffd23f'], [100, 0, '#ff6b6b'], [118, 3, '#9b7bff'], [134, 10, '#5aa9ff']].map(([x, dy, col]) => `<circle cx="${x}" cy="${t + dy}" r="8" fill="${col}"/><circle cx="${x}" cy="${t + dy}" r="3" fill="#fff6b0"/>`).join('')}` },
+  'glasses-heart': { slot: 'face', svg: () => heart(76, 106, 18, '#ff4f81') + heart(124, 106, 18, '#ff4f81') + `<path d="M93,104 L107,104" stroke="#c9305e" stroke-width="4"/><circle cx="70" cy="104" r="4" fill="#fff" opacity=".6"/><circle cx="118" cy="104" r="4" fill="#fff" opacity=".6"/>` },
+  'mask-hero': { slot: 'face', svg: () => `<path d="M48,104 Q60,90 100,98 Q140,90 152,104 Q148,124 124,122 Q108,120 100,112 Q92,120 76,122 Q52,124 48,104Z" fill="#2b2340"/>` + eye(76, 108, 11) + eye(124, 108, 11) },
+  'neck-bell': { slot: 'neck', svg: () => `<path d="M66,154 Q100,170 134,154" fill="none" stroke="#ff4f4f" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="172" r="10" fill="#ffcc33" stroke="#d99a00" stroke-width="3"/><path d="M94,174 H106" stroke="#d99a00" stroke-width="2.5"/>` },
 };
 
 // ---------- Visų dalių aprašas ----------
@@ -169,11 +195,11 @@ export const WEAR = {
 // free: kiek pirmųjų variantų prieinama iš karto; kiti – parduotuvėje.
 export const PARTS = {
   body: { title: 'Kūnas', options: BODIES, free: ['round', 'egg', 'blob', 'bean'], prices: { pear: 25, ghost: 45 } },
-  color: { title: 'Spalva', options: COLORS, free: ['purple', 'teal', 'orange', 'pink', 'green', 'blue'], prices: { yellow: 10, coral: 10, night: 30, gold: 90, rainbow: 140 } },
+  color: { title: 'Spalva', options: COLORS, free: ['purple', 'teal', 'orange', 'pink', 'green', 'blue'], prices: { yellow: 10, coral: 10, lilac: 15, mint: 15, skinLight: 15, skinTan: 15, skinBrown: 15, night: 30, gold: 90, rainbow: 140 } },
   pattern: { title: 'Raštas', options: PATTERNS, free: ['none', 'spots', 'stripes', 'belly'], prices: { hearts: 20, stars: 30 } },
   eyes: { title: 'Akys', options: EYES, free: ['two', 'one', 'three', 'happy', 'googly'], prices: { hearts: 35, stars: 50 } },
   mouth: { title: 'Burna', options: MOUTHS, free: ['smile', 'grin', 'tooth', 'fangs', 'oh', 'cat'], prices: {} },
-  top: { title: 'Ausys ir ragai', options: TOPS, free: ['none', 'catEars', 'roundEars', 'horns', 'antennae', 'bunny'], prices: { sprout: 30, crest: 40, unicorn: 110 } },
+  top: { title: 'Ausys ir ragai', options: TOPS, free: ['none', 'catEars', 'roundEars', 'horns', 'antennae', 'bunny'], prices: { dogEars: 20, hairShort: 25, hairPigtails: 25, hairCurly: 25, sprout: 30, crest: 40, unicorn: 110 } },
   tail: { title: 'Uodega', options: TAILS, free: ['none', 'curl', 'spike', 'puff', 'zap'], prices: { fin: 35 } },
   feet: { title: 'Kojos', options: FEET, free: ['round', 'claws', 'legs', 'float'], prices: { sneakers: 40 } },
 };
@@ -210,8 +236,28 @@ function gradDef(id, c) {
   return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">${stops}</linearGradient>`;
 }
 
+// Vyresnių etapų papuošimai: už padarėlio (back) ir priekyje (front).
+const SPARKS = [[24, 70, 9], [176, 60, 8], [16, 150, 6], [186, 140, 7], [44, 28, 6], [160, 22, 5]];
+function stageFx(fx, id) {
+  if (!fx) return { back: '', front: '' };
+  const glowCol = { glow: '#fff3a0', sparkle: '#ffe680', rainbow: '#ffffff', legend: '#ffd23f' }[fx];
+  let back = `<defs><radialGradient id="${id}fx"><stop offset="0%" stop-color="${glowCol}" stop-opacity=".9"/><stop offset="100%" stop-color="${glowCol}" stop-opacity="0"/></radialGradient></defs>`;
+  if (fx === 'rainbow' || fx === 'legend') {
+    const cols = fx === 'legend' ? ['#ffe680', '#ffcc33', '#e8a300'] : ['#ff7eb6', '#ffd23f', '#7ed957', '#5aa9ff', '#9b7bff'];
+    back += cols.map((col, i) => `<path d="M${8 + i * 7},200 A${92 - i * 7},${110 - i * 7} 0 0 1 ${192 - i * 7},200" fill="none" stroke="${col}" stroke-width="7" opacity=".75"/>`).join('');
+  }
+  back += `<ellipse class="fx-glow" cx="100" cy="128" rx="98" ry="104" fill="url(#${id}fx)"/>`;
+  let front = '';
+  if (fx !== 'glow') {
+    const col = fx === 'legend' ? '#ffcc33' : fx === 'rainbow' ? '#ff7eb6' : '#ffd23f';
+    front = SPARKS.map(([x, y, r], i) => `<g class="fx-spark" style="animation-delay:${(i * 0.35).toFixed(2)}s">${star(x, y, r, i % 2 && fx === 'rainbow' ? '#5aa9ff' : col)}</g>`).join('');
+  }
+  if (fx === 'legend') back += `<ellipse cx="100" cy="216" rx="70" ry="11" fill="#ffcc33" stroke="#d99a00" stroke-width="3"/>`;
+  return { back, front };
+}
+
 // Grąžina padarėlio SVG eilutę.
-// opts.stage: 'egg' | 'baby' | 'teen' | 'big'; opts.scale: mastelis (augimui).
+// opts.stage: etapo id (config.js STAGES); opts.scale: mastelis (augimui); opts.fx: etapo papuošimas.
 export function monsterSVG(monster, opts = {}) {
   const id = `m${++uid}`;
   const parts = monster.parts;
@@ -236,9 +282,11 @@ export function monsterSVG(monster, opts = {}) {
   const outfit = w('body');
   const scale = opts.scale ?? 1;
   const floatFeet = parts.feet === 'float';
+  const fx = stageFx(opts.fx, id);
 
   return `<svg class="${cls}" viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 <defs>${defs.join('')}</defs>
+${fx.back}
 <ellipse class="mon-shadow" cx="100" cy="216" rx="${floatFeet ? 40 : 56}" ry="8" fill="#000" opacity=".1"/>
 <g transform="translate(100 216) scale(${scale}) translate(-100 -216)">
 <g class="mon-move${floatFeet ? ' mon-float' : ''}">
@@ -251,6 +299,7 @@ ${TOPS[parts.top]?.svg(c, t) || ''}
 <g clip-path="url(#${id}c)">
 ${PATTERNS[parts.pattern]?.svg(c0) || ''}
 <ellipse cx="70" cy="86" rx="22" ry="14" fill="#fff" opacity=".25" transform="rotate(-25 70 86)"/>
+${TOPS[parts.top]?.front ? TOPS[parts.top].front(c, t) : ''}
 ${outfit ? outfit.svg() : ''}
 ${neck && neck.clip ? neck.svg() : ''}
 </g>
@@ -264,6 +313,7 @@ ${w('head') ? w('head').svg(t) : ''}
 </g>
 </g>
 </g>
+${fx.front}
 </svg>`;
 }
 

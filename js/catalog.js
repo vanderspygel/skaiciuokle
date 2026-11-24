@@ -3,6 +3,7 @@
 import { PARTS, PART_ORDER, partItemId } from './monster.js';
 
 export const CATEGORIES = [
+  { id: 'friends', title: 'Draugai', icon: '🥚' },
   { id: 'clothes', title: 'Rūbai', icon: '🎩' },
   { id: 'parts', title: 'Kūnas', icon: '🎨' },
   { id: 'furniture', title: 'Baldai', icon: '🛋️' },
@@ -39,6 +40,22 @@ const CLOTHES = [
   ['glasses-star', 'Žvaigždiniai akiniai', 45],
   ['hat-top', 'Cilindras', 60],
   ['hat-crown', 'Karūna', 120],
+  ['neck-bell', 'Varpelis', 14],
+  ['hat-flowercrown', 'Gėlių vainikas', 28],
+  ['outfit-raincoat', 'Lietpaltis', 30],
+  ['outfit-sailor', 'Jūreivio marškinėliai', 32],
+  ['back-backpack', 'Kuprinė', 34],
+  ['glasses-heart', 'Širdelių akiniai', 36],
+  ['outfit-chef', 'Virėjo švarkelis', 38],
+  ['hat-chef', 'Virėjo kepurė', 38],
+  ['hat-headphones', 'Ausinės', 42],
+  ['back-balloon', 'Balionas', 44],
+  ['mask-hero', 'Superherojaus kaukė', 48],
+  ['hat-pirate', 'Pirato skrybėlė', 55],
+  ['outfit-dino', 'Dinozauro kostiumas', 65],
+  ['hat-wizard', 'Burtininko kepurė', 75],
+  ['outfit-astronaut', 'Astronauto kostiumas', 85],
+  ['back-rocket', 'Reaktyvinė kuprinė', 100],
 ].map(([id, name, price]) => ({ id, cat: 'clothes', name, price }))
   .sort((a, b) => a.price - b.price);
 
@@ -65,7 +82,26 @@ const FURNITURE = [
   ['f-carousel', 'Karuselė', 130, '🎠', null, 1.6],
   ['f-castle', 'Pilis', 150, '🏰', null, 1.8],
   ['f-rocket', 'Raketa', 160, '🚀', null, 1.5],
-].map(([id, name, price, emoji, kind, size]) => ({ id, cat: 'furniture', name, price, emoji, kind: kind || 'emoji', size: size || 1 }));
+  ['f-flower', 'Saulėgrąža', 7, '🌻'],
+  ['f-kite', 'Aitvaras', 9, '🪁'],
+  ['f-yoyo', 'Jojo', 9, '🪀'],
+  ['f-basketball', 'Krepšinio kamuolys', 10, '🏀'],
+  ['f-gift', 'Dovana', 12, '🎁'],
+  ['f-dino', 'Dinozauriukas', 14, '🦖'],
+  ['f-paint', 'Dažai', 16, '🎨'],
+  ['f-clock', 'Laikrodis', 18, '🕰️'],
+  ['f-skate', 'Riedlentė', 20, '🛹'],
+  ['f-snowman', 'Senis besmegenis', 22, '⛄', null, 1.2],
+  ['f-tree', 'Eglutė', 28, '🎄', null, 1.4],
+  ['f-tv', 'Televizorius', 32, '📺', null, 1.2],
+  ['f-drum', 'Būgnas', 38, '🥁'],
+  ['f-tent', 'Palapinė', 60, '⛺', null, 1.5],
+  ['f-slide', 'Čiuožykla', 75, '🛝', null, 1.5],
+  ['f-fountain', 'Fontanas', 90, '⛲', null, 1.5],
+  ['f-ferris', 'Apžvalgos ratas', 140, '🎡', null, 1.8],
+  ['f-circus', 'Cirkas', 180, '🎪', null, 1.8],
+].map(([id, name, price, emoji, kind, size]) => ({ id, cat: 'furniture', name, price, emoji, kind: kind || 'emoji', size: size || 1 }))
+  .sort((a, b) => a.price - b.price);
 
 // Tapetai ir grindys – CSS fonai (stiliai css/style.css: .wall-*, .floor-*).
 const DECOR = [
@@ -80,7 +116,13 @@ const DECOR = [
   ['wall-night', 'Žvaigždėta naktis', 60, 'wall'],
   ['floor-clouds', 'Debesų grindys', 70, 'floor'],
   ['wall-candy', 'Saldainių siena', 90, 'wall'],
-].map(([id, name, price, slot]) => ({ id, cat: 'decor', name, price, slot }));
+  ['wall-stripes', 'Vaivorykštės juostos', 40, 'wall'],
+  ['wall-forest', 'Miško siena', 50, 'wall'],
+  ['floor-checker', 'Šachmatų grindys', 25, 'floor'],
+  ['floor-sand', 'Smėlis', 35, 'floor'],
+  ['floor-gold', 'Auksinės grindys', 120, 'floor'],
+].map(([id, name, price, slot]) => ({ id, cat: 'decor', name, price, slot }))
+  .sort((a, b) => a.price - b.price);
 
 // Skanėstai – tik smagi animacija, neperkami „visam laikui“.
 const TREATS = [
@@ -89,7 +131,15 @@ const TREATS = [
   ['t-icecream', 'Ledai', 8, '🍦'],
   ['t-cupcake', 'Keksiukas', 10, '🧁'],
   ['t-cake', 'Tortas', 15, '🍰'],
-].map(([id, name, price, emoji]) => ({ id, cat: 'treats', name, price, emoji, consumable: true }));
+  ['t-banana', 'Bananas', 3, '🍌'],
+  ['t-strawberry', 'Braškės', 4, '🍓'],
+  ['t-watermelon', 'Arbūzas', 5, '🍉'],
+  ['t-chocolate', 'Šokoladas', 6, '🍫'],
+  ['t-donut', 'Spurgytė', 7, '🍩'],
+  ['t-pizza', 'Pica', 9, '🍕'],
+  ['t-pancakes', 'Blynai', 10, '🥞'],
+].map(([id, name, price, emoji]) => ({ id, cat: 'treats', name, price, emoji, consumable: true }))
+  .sort((a, b) => a.price - b.price);
 
 // Kūno dalys ir spalvos iš monster.js kainų.
 const PART_ITEMS = [];
@@ -101,7 +151,39 @@ for (const cat of PART_ORDER) {
 }
 PART_ITEMS.sort((a, b) => a.price - b.price);
 
-export const ITEMS = [...CLOTHES, ...PART_ITEMS, ...FURNITURE, ...DECOR, ...TREATS];
+// Draugai: nupirkus atsiranda naujas kiaušinis, kuris auga atskirai.
+// parts – iš ko išsiris; grants – kokias kūno dalis kartu gauna (kad galėtų keisti).
+// repeat: galima pirkti daug kartų (bet kokio padarėlio kūrimas).
+// SPĖJIMAS: kainos ir tai, kad draugai perkami už ⭐, – Lukas gali pakeisti.
+const P = (body, color, pattern, eyes, mouth, top, tail, feet) => ({ body, color, pattern, eyes, mouth, top, tail, feet });
+export const FRIEND_KINDS = [
+  { kind: 'monster', name: 'Padarėlis', price: 60, repeat: true, emoji: '👾', names: ['Bumbulis', 'Burbulas', 'Gugis', 'Dzinga'], parts: null },
+  { kind: 'cat', name: 'Kačiukas', price: 50, emoji: '🐱', names: ['Murkis', 'Pūkė', 'Rainius'], parts: P('round', 'orange', 'stripes', 'two', 'cat', 'catEars', 'curl', 'round') },
+  { kind: 'dog', name: 'Šuniukas', price: 50, emoji: '🐶', names: ['Margis', 'Reksas', 'Bimba'], parts: P('bean', 'yellow', 'spots', 'two', 'tooth', 'dogEars', 'curl', 'round'), wear: { neck: 'neck-bell' } },
+  { kind: 'bunny', name: 'Kiškutis', price: 70, emoji: '🐰', names: ['Ilgaausis', 'Morkytė', 'Šuoliukas'], parts: P('egg', 'pink', 'belly', 'two', 'smile', 'bunny', 'puff', 'round') },
+  { kind: 'bear', name: 'Meškiukas', price: 70, emoji: '🐻', names: ['Rudnosis', 'Medutis', 'Mika'], parts: P('round', 'skinBrown', 'belly', 'two', 'tooth', 'roundEars', 'none', 'round') },
+  { kind: 'girl', name: 'Mergaitė', price: 90, emoji: '👧', names: ['Ema', 'Lukrecija', 'Gabija', 'Austėja'], parts: P('egg', 'skinLight', 'none', 'two', 'smile', 'hairPigtails', 'none', 'sneakers'), wear: { body: 'outfit-dress' } },
+  { kind: 'boy', name: 'Berniukas', price: 90, emoji: '👦', names: ['Jonas', 'Matas', 'Kajus', 'Dominykas'], parts: P('round', 'skinTan', 'none', 'two', 'grin', 'hairShort', 'none', 'sneakers'), wear: { body: 'outfit-tee' } },
+  { kind: 'kid', name: 'Garbanė', price: 90, emoji: '🧒', names: ['Liepa', 'Saulė', 'Rūta'], parts: P('bean', 'skinBrown', 'none', 'happy', 'smile', 'hairCurly', 'none', 'sneakers'), wear: { body: 'outfit-overalls' } },
+  { kind: 'alien', name: 'Ateivis', price: 110, emoji: '👽', names: ['Zorbas', 'Bzz', 'Kosmis'], parts: P('bean', 'green', 'spots', 'three', 'oh', 'antennae', 'none', 'float') },
+  { kind: 'dragon', name: 'Drakoniukas', price: 140, emoji: '🐲', names: ['Ugnelis', 'Spygliukas', 'Drakis'], parts: P('pear', 'teal', 'belly', 'googly', 'fangs', 'crest', 'spike', 'claws') },
+  { kind: 'ghost', name: 'Vaiduokliukas', price: 140, emoji: '👻', names: ['Ūū', 'Šmėkla', 'Bū'], parts: P('ghost', 'lilac', 'none', 'happy', 'oh', 'none', 'none', 'float') },
+  { kind: 'mermaid', name: 'Žuvytė', price: 160, emoji: '🐟', names: ['Bangelė', 'Perlė', 'Burbulė'], parts: P('egg', 'mint', 'hearts', 'two', 'smile', 'none', 'fin', 'float') },
+  { kind: 'unicorn', name: 'Vienaragis', price: 220, emoji: '🦄', names: ['Žvaigždė', 'Stebuklas', 'Vaivorė'], parts: P('round', 'pink', 'hearts', 'hearts', 'smile', 'unicorn', 'puff', 'legs') },
+].map(f => ({ ...f, id: 'friend:' + f.kind, cat: 'friends', consumable: !!f.repeat }));
+
+// Kokias mokamas dalis gauna su draugu.
+export function friendGrants(fk) {
+  if (!fk.parts) return [];
+  const parts = PART_ORDER.filter(cat => PARTS[cat].prices[fk.parts[cat]] !== undefined).map(cat => partItemId(cat, fk.parts[cat]));
+  return [...parts, ...Object.values(fk.wear || {})];
+}
+
+export function friendKind(kind) {
+  return FRIEND_KINDS.find(f => f.kind === kind) || FRIEND_KINDS[0];
+}
+
+export const ITEMS = [...FRIEND_KINDS, ...CLOTHES, ...PART_ITEMS, ...FURNITURE, ...DECOR, ...TREATS];
 
 export const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 

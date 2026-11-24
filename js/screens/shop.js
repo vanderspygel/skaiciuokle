@@ -1,9 +1,9 @@
 // Parduotuvė: rūbai, kūno dalys, baldai, sienos ir grindys, skanėstai.
 
 import { h, svgEl, modal, confetti } from '../ui.js';
-import { CATEGORIES, itemsIn, isOwned } from '../catalog.js';
-import { monsterSVG, COLORS, WEAR } from '../monster.js';
-import { spendStars } from '../rewards.js';
+import { CATEGORIES, itemsIn, isOwned, friendGrants } from '../catalog.js';
+import { monsterSVG, COLORS, WEAR, randomParts } from '../monster.js';
+import { spendStars, addFriend } from '../rewards.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
 
@@ -24,6 +24,10 @@ export function render(ctx, { tab: initialTab } = {}) {
   }
 
   function preview(item, big = false) {
+    if (item.cat === 'friends') {
+      if (!item.parts) return h('div.item-preview.emoji' + (big ? '.big' : ''), null, item.emoji);
+      return h('div.item-preview' + (big ? '.big' : ''), null, svgEl(monsterSVG({ parts: item.parts, wear: item.wear || {} })));
+    }
     if (item.cat === 'clothes' || (item.cat === 'parts' && item.part !== 'color')) {
       return h('div.item-preview' + (big ? '.big' : ''), null, svgEl(monsterSVG(previewMonster(item))));
     }
@@ -60,7 +64,27 @@ export function render(ctx, { tab: initialTab } = {}) {
     mv.react('spin');
   }
 
+  // Naujas draugas: kiaušinis su pasirinktos rūšies išvaizda; po to – vardas ir išvaizda.
+  function buyFriend(item) {
+    if (!spendStars(s, item.price)) return false;
+    if (!item.repeat) s.owned.push(item.id);
+    for (const g of friendGrants(item)) if (!s.owned.includes(g)) s.owned.push(g);
+    s.counters.purchases += 1;
+    addFriend(s, {
+      kind: item.kind,
+      name: item.names[Math.floor(Math.random() * item.names.length)],
+      parts: item.parts ? { ...item.parts } : randomParts(s.owned),
+      wear: { ...(item.wear || {}) },
+    });
+    ctx.updateStarCounters();
+    ctx.save();
+    ctx.checkBadges();
+    ctx.go('create', { newFriend: true });
+    return true;
+  }
+
   function buy(item) {
+    if (item.cat === 'friends') return buyFriend(item);
     if (!spendStars(s, item.price)) return false;
     if (item.consumable) {
       s.counters.fed += 1;
@@ -89,10 +113,11 @@ export function render(ctx, { tab: initialTab } = {}) {
     let close;
     const actions = [];
     if (!owned) {
-      const verb = item.consumable ? 'Pavaišinti' : 'Pirkti';
+      const verb = item.cat === 'friends' ? 'Gauti kiaušinį' : item.consumable ? 'Pavaišinti' : 'Pirkti';
       actions.push(h('button.btn.btn-primary.btn-big', {
         disabled: missing > 0,
         onclick: () => {
+          if (item.cat === 'friends') { close(); buy(item); return; }
           if (!buy(item)) return;
           close();
           confetti(30);
@@ -103,6 +128,8 @@ export function render(ctx, { tab: initialTab } = {}) {
         },
       }, `${verb} už ${item.price} ⭐`));
       if (missing > 0) actions.push(h('div.sheet-missing', null, `Dar trūksta ${missing} ⭐`));
+    } else if (item.cat === 'friends') {
+      actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('friends'); } }, 'Pas draugus 👫'));
     } else if (item.cat === 'furniture') {
       actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('room'); } }, 'Į kambarį 🏠'));
     } else {
@@ -118,6 +145,7 @@ export function render(ctx, { tab: initialTab } = {}) {
       preview(item, true),
       h('div.sheet-name', null, item.name),
       item.group ? h('div.sheet-group', null, item.group) : null,
+      item.cat === 'friends' ? h('div.sheet-group', null, item.repeat ? 'Susikurk dar vieną padarėlį! Jis augs atskirai.' : 'Iš kiaušinio išsiris naujas draugas. Jis augs atskirai.') : null,
       h('div.sheet-actions', null, actions)), { className: 'modal-sheet' });
   }
 

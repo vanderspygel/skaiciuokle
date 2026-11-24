@@ -74,6 +74,15 @@ export function render(ctx) {
   draggable(mnode, s.room.monster, { minY: 45, onTap: () => { mv.react(Math.random() < 0.5 ? 'spin' : 'jump'); mv.say(['Mano kambarys!', 'Jauku!', 'Hi hi!', 'Gražu!'][Math.floor(Math.random() * 4)], 1400); } });
   room.append(mnode);
 
+  // Kiti draugai irgi gyvena kambaryje.
+  (s.friends || []).forEach((f, i) => {
+    if (!f.pos) f.pos = { x: 15 + (i * 17) % 70, y: 60 + (i * 7) % 30 };
+    const fv = monsterView(ctx, { className: 'room-monster room-friend', interactive: false, monster: f });
+    const fnode = h('div.room-item.room-monster-wrap', null, fv.el);
+    draggable(fnode, f.pos, { minY: 45, onTap: () => { fv.react(Math.random() < 0.5 ? 'spin' : 'jump'); fv.say(['Labas!', `Aš ${f.name}!`, 'Pažaidžiam?', 'Hi hi!'][Math.floor(Math.random() * 4)], 1400); } });
+    room.append(fnode);
+  });
+
   // Sienų ir grindų keitimas iš nupirktų.
   const decorBar = h('div.room-decor');
   function drawDecor() {
@@ -95,7 +104,7 @@ export function render(ctx) {
     : null;
 
   const el = screen('room',
-    topBar(ctx, { title: `${s.monster.name} kambarys` }),
+    topBar(ctx, { title: s.friends && s.friends.length ? 'Draugų kambarys' : `${s.monster.name} kambarys` }),
     h('div.room-wrap', null, room, empty),
     h('div.room-tools', null, h('span.room-hint', null, '👆 Tempk daiktus'), decorBar));
 

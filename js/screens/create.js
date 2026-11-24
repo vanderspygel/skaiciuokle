@@ -1,6 +1,7 @@
 import { h, svgEl } from '../ui.js';
 import { monsterSVG, PARTS, PART_ORDER, COLORS, WEAR, availableOptions, randomParts } from '../monster.js';
 import { ITEM_BY_ID, isOwned } from '../catalog.js';
+import { addFriend } from '../rewards.js';
 import { topBar, screen } from './common.js';
 
 const NAMES = ['Bumbulis', 'Pūkis', 'Žirnelis', 'Burbulas', 'Mimi', 'Tošis', 'Kakaris', 'Saulutė', 'Bubu', 'Ūsius', 'Dzinga', 'Pupa', 'Gugis', 'Lola', 'Žybsnis'];
@@ -8,7 +9,7 @@ const NAMES = ['Bumbulis', 'Pūkis', 'Žirnelis', 'Burbulas', 'Mimi', 'Tošis', 
 const TAB_ICONS = { body: '🫧', color: '🎨', pattern: '🔵', eyes: '👀', mouth: '👄', top: '🦄', tail: '〰️', feet: '🦶', wear: '🎩' };
 const SLOTS = [['body', 'Drabužiai'], ['back', 'Ant nugaros'], ['head', 'Kepurė'], ['face', 'Akiniai'], ['neck', 'Kaklui']];
 
-export function render(ctx, { first = false } = {}) {
+export function render(ctx, { first = false, newFriend = false } = {}) {
   const s = ctx.state;
   const draft = s.monster
     ? JSON.parse(JSON.stringify(s.monster))
@@ -99,7 +100,8 @@ export function render(ctx, { first = false } = {}) {
   function finish() {
     draft.name = draft.name.trim();
     if (!draft.name) { nameInput.focus(); return; }
-    s.monster = draft;
+    if (s.monster) s.monster = draft; // kopija išlaiko uid, kind ir grow
+    else addFriend(s, { ...draft, kind: 'monster' });
     ctx.save();
     ctx.go('home');
   }
@@ -112,12 +114,12 @@ export function render(ctx, { first = false } = {}) {
   const el = screen('create',
     first
       ? h('header.topbar', null, h('span.btn-icon-space'), h('div.topbar-title', null, 'Susikurk savo padarėlį!'), h('span.btn-icon-space'))
-      : topBar(ctx, { title: 'Padarėlis' }),
+      : topBar(ctx, { title: newFriend ? 'Naujas draugas!' : s.monster.name }),
     h('div.create-layout', null,
       h('section.create-left', null,
         preview,
         h('label.name-label', null, 'Kuo jis vardu?', nameInput),
-        first ? h('p.hint', null, 'Iš kiaušinio išsiris būtent toks!') : null),
+        first || newFriend ? h('p.hint', null, 'Iš kiaušinio išsiris būtent toks!') : null),
       h('section.create-right', null, tabBar, grid)),
     h('footer.create-footer', null,
       h('button.btn.btn-secondary.btn-big', { onclick: randomize }, '🎲 Atsitiktinis'),
