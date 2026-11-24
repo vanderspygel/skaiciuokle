@@ -6,12 +6,8 @@ export const ROOMS = [
   { id: 'home', name: 'Kambarys', icon: '🏠', price: 0, wallpaper: 'wall-cream', floor: 'floor-wood' },
   { id: 'bedroom', name: 'Miegamasis', icon: '🛏️', price: 40, wallpaper: 'wall-night', floor: 'floor-carpet', starter: ['f-bed', 'f-lamp'] },
   { id: 'kitchen', name: 'Virtuvė', icon: '🍳', price: 60, wallpaper: 'wall-kitchen', floor: 'floor-tiles', starter: ['f-teapot', 'f-plates'] },
-  { id: 'bathroom', name: 'Vonia', icon: '🛁', price: 80, wallpaper: 'wall-bath', floor: 'floor-bath', starter: ['f-bathtub', 'f-duck'] },
-  { id: 'playroom', name: 'Žaidimų kambarys', icon: '🧸', price: 120, wallpaper: 'wall-stripes', floor: 'floor-checker', starter: ['f-ball', 'f-puzzle'] },
   { id: 'yard', name: 'Kiemas', icon: '🌳', price: 150, wallpaper: 'wall-sky', floor: 'floor-grass', starter: ['f-tree2', 'f-swing'] },
-  { id: 'treehouse', name: 'Namelis medyje', icon: '🌲', price: 250, wallpaper: 'wall-planks', floor: 'floor-wood', starter: ['f-books', 'f-telescope'] },
   { id: 'castle', name: 'Pilies menė', icon: '🏰', price: 350, wallpaper: 'wall-castle', floor: 'floor-stone', starter: ['f-throne', 'f-shield'] },
-  { id: 'sea', name: 'Povandeninis kambarys', icon: '🐠', price: 400, wallpaper: 'wall-sea', floor: 'floor-sand', starter: ['f-coral', 'f-shell'] },
   { id: 'space', name: 'Kosminė stotis', icon: '🚀', price: 500, wallpaper: 'wall-space', floor: 'floor-metal', starter: ['f-planet', 'f-ufo'] },
 ];
 
