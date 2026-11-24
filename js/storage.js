@@ -13,6 +13,7 @@ export function defaultState() {
     owned: [],
     room: { wallpaper: 'wall-cream', floor: 'floor-wood', items: [], monster: { x: 50, y: 72 } },
     progress: { unlocked: 1, levels: {} },
+    progress20: { unlocked: 1, levels: {} }, // žaidimas „Iki 20“
     stats: {},
     streak: 0,
     counters: { correct: 0, fast: 0, bestStreak: 0, purchases: 0, tests: 0, perfectTests: 0, perfectCheetah: 0, mistakesCleared: 0, fed: 0, written: 0 },
@@ -20,7 +21,7 @@ export function defaultState() {
     days: { last: null, streak: 0, best: 0, total: 0 },
     tests: [],
     badges: {},
-    prefs: { lastSpeed: 'turtle', lastTestCount: 10, lastInput: 'pad' },
+    prefs: { lastSpeed: 'turtle', lastTestCount: 10, lastInput: 'pad', game: 10 },
   };
 }
 

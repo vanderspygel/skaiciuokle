@@ -6,11 +6,11 @@
 //  write    – atsakymas rašomas pirštu (be laiko).
 
 import { h, svgEl, pulse, confetti, toast } from '../ui.js';
-import { LEVELS, LIMITS, SPEEDS, FAST_BONUS, WRITE_STARS } from '../config.js';
+import { SPEEDS, FAST_BONUS, WRITE_STARS, gameFor } from '../config.js';
 import { Scheduler, makeChoices, checkAnswer, recordResult } from '../math.js';
 import { buildTemplates, recognizeNumber, addSample } from '../handwriting.js';
 import { drawPad } from '../drawpad.js';
-import { updateStreak, recordLevelAnswer, unlockedKinds, stageFor } from '../rewards.js';
+import { updateStreak, recordLevelAnswer, unlockedLevels, stageFor } from '../rewards.js';
 import { monsterSVG } from '../monster.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
@@ -24,9 +24,15 @@ export function render(ctx, params) {
   const s = ctx.state;
   const mode = params.mode;
   const isTest = mode === 'test';
-  const level = mode === 'practice' ? LEVELS[params.level - 1] : null;
+  // Žaidimas „Iki 10“ arba „Iki 20“ – pasirenkamas pradžios ekrane.
+  const game = gameFor(s);
+  const level = mode === 'practice' ? game.levels[params.level - 1] : null;
   const speed = (mode === 'mental' || isTest) ? SPEEDS.find(x => x.id === params.speed) || SPEEDS[0] : null;
-  const limits = (level && level.limits) || LIMITS;
+  const limits = (level && level.limits) || game.limits;
+  // Mygtukai ir rašysena – visi žaidimo skaičiai (ne lygio), kad nebūtų galima atspėti.
+  // Klaidų taisyme – pagal pačias užduotis (kontrolinis galėjo būti kito žaidimo).
+  const reviewMax = mode === 'review' ? Math.max(0, ...params.problems.map(p => (typeof p.answer === 'number' ? p.answer : 0))) : 0;
+  const maxAnswer = reviewMax > game.limits.maxResult ? 20 : Math.max(game.limits.maxResult, game.limits.maxNumber);
   const total = isTest ? params.count : mode === 'review' ? params.problems.length : ROUND;
 
   // Įvedimo būdas: visada visi skaičiai 0–10, kad nebūtų galima tiesiog atspėti.
@@ -46,9 +52,9 @@ export function render(ctx, params) {
   let reviewQueue = null;
   if (mode === 'review') reviewQueue = params.problems.slice();
   else {
-    let kinds = level ? level.kinds : unlockedKinds(s);
-    if (isWrite) kinds = kinds.filter(k => k !== 'compare');
-    scheduler = new Scheduler({ kinds, limits, stats: s.stats });
+    let sources = level ? [level] : unlockedLevels(s, game);
+    if (isWrite) sources = sources.map(l => ({ ...l, kinds: l.kinds.filter(k => k !== 'compare') }));
+    scheduler = new Scheduler({ sources, stats: s.stats });
   }
 
   // ---------- DOM ----------
@@ -72,7 +78,8 @@ export function render(ctx, params) {
       walker);
   }
 
-  const title = level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}${useDraw ? ' ✍️' : ''}`;
+  const gameTag = game.id === 10 ? '' : ` · iki ${game.id}`;
+  const title = (level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}${useDraw ? ' ✍️' : ''}`) + gameTag;
   const el = screen('quiz' + (isTest ? '.is-test' : ''),
     topBar(ctx, { back: mode === 'practice' ? 'levels' : 'home', title, extra: dots }),
     track,
@@ -262,7 +269,7 @@ export function render(ctx, params) {
   // Perskaitom, ką vaikas parašė, ir parodom tai „?“ langelyje.
   function readDrawing(strokes) {
     if (locked || !strokes.length) return;
-    const r = recognizeNumber(strokes, templates, Math.max(LIMITS.maxResult, LIMITS.maxNumber));
+    const r = recognizeNumber(strokes, templates, maxAnswer);
     if (r.value === null) {
       lastRead = null;
       selected = null;
@@ -306,9 +313,10 @@ export function render(ctx, params) {
         answersEl.append(btn);
       }
     } else {
-      // Mygtukai pagal bendras ribas (ne lygio), kad ir 1 lygyje būtų visi 0–10.
-      const max = Math.max(LIMITS.maxResult, LIMITS.maxNumber);
-      const pad = h('div.numpad');
+      // Mygtukai pagal žaidimo ribas (ne lygio), kad ir 1 lygyje būtų visi 0–10 (0–20).
+      // Iki 20 – eilėmis po dešimt: 1–10, 11–20, 0.
+      const max = maxAnswer;
+      const pad = h('div.numpad' + (max > 10 ? '.numpad-wide' : ''));
       const keys = [];
       for (let v = 1; v <= max; v++) keys.push(v);
       keys.push(0);
@@ -365,7 +373,7 @@ export function render(ctx, params) {
       recordResult(s.stats, problem, correct, ms);
       if (scheduler) scheduler.report(problem, correct);
       if (level) {
-        const unlocked = recordLevelAnswer(s, level.id, correct);
+        const unlocked = recordLevelAnswer(s, level.id, correct, game);
         if (unlocked) {
           toast(h('div.badge-toast', null, h('span.badge-toast-icon', null, '🔓'),
             h('div', null, h('b', null, 'Naujas lygis!'), h('div', null, `${unlocked.id}. ${unlocked.title}`))));

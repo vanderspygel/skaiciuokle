@@ -183,6 +183,9 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .growth-bar { width: 200px; height: 18px; background: #fff; border: 3px solid var(--line); border-radius: 999px; overflow: hidden; }
 .growth-fill { height: 100%; background: linear-gradient(90deg, #ffd23f, #7ed957); border-radius: 999px; }
 
+.game-switch { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.game-btn { min-width: 150px; min-height: 60px; font-size: 26px; font-weight: 900; border-radius: 30px; }
+.game-btn[aria-pressed="true"] { background: #f1ebff; border-color: var(--primary); box-shadow: 0 5px 0 var(--primary-dark); }
 .home-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; }
 .btn-mode {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
@@ -335,6 +338,9 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .key.selected { background: #f1ebff; border-color: var(--primary); box-shadow: 0 5px 0 var(--primary-dark); }
 .key.right { background: #e6f8ee; border-color: var(--good); }
 .key-check { grid-column: span 4; font-size: 30px; min-height: 78px; }
+.numpad-wide { grid-template-columns: repeat(10, minmax(56px, 84px)); gap: 8px; }
+.numpad-wide .key { font-size: 34px; }
+.numpad-wide .key-check { grid-column: span 9; }
 
 /* Rašymo lenta */
 .drawpad { position: relative; border: 4px dashed #cfc3e8; border-radius: 28px; background: #fff; touch-action: none; }
@@ -576,6 +582,8 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
   .btn-mode { font-size: 22px; }
   .btn-small-tile { flex-direction: column; gap: 2px; font-size: 18px; }
   .numpad { grid-template-columns: repeat(5, minmax(56px, 1fr)); gap: 8px; }
+  .numpad-wide { grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .numpad-wide .key { font-size: 24px; }
   .badges-summary { grid-template-columns: repeat(2, 1fr); }
   .quiz-monster { display: none; }
 }

@@ -282,13 +282,15 @@ export function recognizeNumber(gesture, templates, max = 10) {
   const results = groups.map(g => recognizeDigit(g, templates));
   if (results.some(r => !r || r.distance > REJECT_DISTANCE)) return { value: null, groups, results };
   let digits = results.map(r => r.digit);
-  // Dviženklis: pirmas skaitmuo turi būti 1 (iki 10 – tik „10“). Jei pirmas
-  // panašus į 1 kaip antras variantas – pasitikim juo.
-  if (digits.length === 2 && digits[0] !== 1) {
-    const one = results[0].ranked.find(r => r.digit === 1);
-    if (one && one.distance < results[0].distance * 1.4) digits[0] = 1;
+  // Dviženklis: pirmas skaitmuo gali būti tik 1 (iki 20 – ir 2). Jei atpažintas
+  // kitas, bet leistinas yra artimas antras variantas – pasitikim juo.
+  const tens = Math.floor(max / 10);
+  if (digits.length === 2 && !(digits[0] >= 1 && digits[0] <= tens)) {
+    const alt = results[0].ranked.find(r => r.digit >= 1 && r.digit <= tens);
+    if (alt && alt.distance < results[0].distance * 1.4) digits[0] = alt.digit;
   }
-  if (digits.length === 2 && max <= 10 && digits[1] !== 0) {
+  // Paskutinė dešimtis (10, 20): antras skaitmuo gali būti tik 0.
+  if (digits.length === 2 && digits[0] === tens && max % 10 === 0 && digits[1] !== 0) {
     const zero = results[1].ranked.find(r => r.digit === 0);
     if (zero && zero.distance < results[1].distance * 1.4) digits[1] = 0;
   }

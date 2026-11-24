@@ -98,3 +98,27 @@ test('migracija užpildo trūkstamus laukus', () => {
   assert.equal(s.schemaVersion, SCHEMA_VERSION);
   assert.equal(migrate(null).stars, 0);
 });
+
+// ---------- Du žaidimai ----------
+
+test('žaidimai iki 10 ir iki 20 turi atskirą pažangą', async () => {
+  const { GAMES } = await import('../js/config.js');
+  const { gameProgress, unlockedLevels } = await import('../js/rewards.js');
+  const s = defaultState();
+  for (let i = 0; i < 15; i++) recordLevelAnswer(s, 1, true, GAMES[20]);
+  assert.equal(gameProgress(s, GAMES[20]).unlocked, 2);
+  assert.equal(s.progress.unlocked, 1);
+  assert.deepEqual(unlockedLevels(s, GAMES[20]).map(l => l.title), ['Sudėtis be perėjimo', 'Atimtis be perėjimo']);
+  assert.deepEqual(unlockedKinds(s), ['add']);
+});
+
+test('seni duomenys gauna žaidimą iki 20 ir lieka žaidime iki 10', () => {
+  const old = defaultState();
+  delete old.progress20;
+  delete old.prefs.game;
+  old.progress.unlocked = 6;
+  const s = migrate(JSON.parse(JSON.stringify(old)));
+  assert.equal(s.progress.unlocked, 6);
+  assert.deepEqual(s.progress20, { unlocked: 1, levels: {} });
+  assert.equal(s.prefs.game, 10);
+});
