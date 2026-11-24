@@ -1,7 +1,7 @@
 // Mintinai ir kontrolinio nustatymai: laiko lygis, užduočių skaičius, istorija.
 
 import { h } from '../ui.js';
-import { SPEEDS } from '../config.js';
+import { SPEEDS, speedEmoji } from '../config.js';
 import { topBar, screen } from './common.js';
 
 export function render(ctx, { mode }) {
@@ -72,11 +72,11 @@ export function render(ctx, { mode }) {
     history = h('section.history', null,
       h('h2', null, 'Mano kontroliniai'),
       h('div.history-strip', null, recent.map(t => {
-        const sp = SPEEDS.find(x => x.id === t.speed);
         return h('div.history-item', null,
           h('div.history-stars', null, '⭐'.repeat(t.rating) || '💪'),
           h('div.history-score', null, `${t.ok}/${t.n}`),
-          h('div.history-meta', null, `${sp ? sp.emoji : { turtle: '🐢', rabbit: '🐇' }[t.speed] || ''} ${t.date.slice(5).replace('-', '.')}`));
+          h('div.history-meta', null, `${speedEmoji(t.speed)} ${t.date.slice(5).replace('-', '.')}`),
+          t.game ? h('div.history-game', null, `iki ${t.game}`) : null);
       })));
   }
 

@@ -1,7 +1,7 @@
 // Kontrolinio rezultatai: žvaigždutės, reakcija, klaidų sąrašas.
 
 import { h, confetti } from '../ui.js';
-import { testRating, testBonus } from '../config.js';
+import { testRating, testBonus, gameFor } from '../config.js';
 import { problemText, answerText } from '../math.js';
 import { dateKey } from '../rewards.js';
 import { monsterView } from '../monsterView.js';
@@ -14,7 +14,7 @@ export function render(ctx, { log, speed, count, input }) {
   const bonus = testBonus(rating.stars, count);
   const mistakes = log.filter(x => !x.correct);
 
-  s.tests.push({ date: dateKey(), n: count, speed, ok, rating: rating.stars });
+  s.tests.push({ date: dateKey(), n: count, speed, ok, rating: rating.stars, game: gameFor(s).id });
   if (s.tests.length > 200) s.tests.splice(0, s.tests.length - 200);
   s.counters.tests += 1;
   if (ok === count) {

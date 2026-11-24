@@ -298,6 +298,7 @@ export function render(ctx, params) {
     answersEl.textContent = '';
     const type = inputFor(problem);
     answersEl.className = 'answers answers-' + type;
+    el.classList.toggle('monster-up', type === 'draw' || (type === 'pad' && maxAnswer > 10));
     if (type === 'draw') {
       pad = drawPad({ onPause: readDrawing });
       const clearBtn = h('button.btn.btn-secondary.draw-clear', { onclick: () => { clearDrawing(); feedbackEl.textContent = ''; } }, 'Trinti 🧽');

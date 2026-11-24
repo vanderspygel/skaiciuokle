@@ -122,7 +122,13 @@ export function render(ctx, params = {}) {
     draggable(fnode, pos, {
       minY: 45,
       onTap: () => { fv.react(Math.random() < 0.5 ? 'spin' : 'jump'); fv.say(lines[Math.floor(Math.random() * 4)], 1400); },
-      onDrop: to => { f.room = to; relocated(f.name, to); },
+      onDrop: to => {
+        // Naujame kambaryje – ant grindų, ne ten, kur buvo mygtukas.
+        f.room = to;
+        pos.x = 20 + Math.random() * 60;
+        pos.y = 65 + Math.random() * 25;
+        relocated(f.name, to);
+      },
     });
     room.append(fnode);
     if (active || !greeter) greeter = fv;
