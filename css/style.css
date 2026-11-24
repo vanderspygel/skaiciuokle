@@ -587,6 +587,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .grid-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
 .grid-legend-item { display: inline-flex; align-items: center; gap: 6px; }
 .grid-swatch { width: 18px; height: 18px; border-radius: 5px; display: inline-block; }
+.history-game, .parent-test-game { font-size: 13px; font-weight: 800; color: var(--primary); }
 .parent-tests { display: flex; gap: 10px; overflow-x: auto; align-items: flex-end; padding-bottom: 4px; }
 .parent-test { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 56px; }
 .parent-test-bar { width: 30px; height: 90px; background: #f3eee6; border-radius: 8px; display: flex; align-items: flex-end; overflow: hidden; }

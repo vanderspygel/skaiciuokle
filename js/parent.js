@@ -92,6 +92,31 @@ export function factGrid(stats, op, max = 10) {
   return rows;
 }
 
+// Lentelė iki 20 (tik užduotys per dešimtį, kaip žaidime „Iki 20“), 11 stulpelių pločio:
+//  sudėtis – eilutė didesnis dėmuo (1–20), stulpelis mažesnis (0–10), suma 11–20;
+//            8 + 5 ir 5 + 8 sudedami į vieną langelį;
+//  atimtis – eilutė iš kiek (11–20), stulpelis kiek atimama (0–10).
+// Grąžina { rowLabels, colLabels, rows } (langeliai kaip factGrid).
+export function factGrid20(stats, op) {
+  const st = stats || {};
+  const cell = keys => {
+    let n = 0, err = 0, ms = 0;
+    for (const k of keys) { const x = st[k]; if (x) { n += x.n; err += x.err; ms += x.ms; } }
+    return n ? { n, err, errRate: err / n, avgMs: ms / n } : { n: 0 };
+  };
+  const colLabels = Array.from({ length: 11 }, (_, b) => b);
+  const rowLabels = [], rows = [];
+  if (op === '+') {
+    for (let a = 1; a <= 20; a++) {
+      const row = colLabels.map(b => (b <= a && a + b > 10 && a + b <= 20 ? cell(a === b ? [`${a}+${b}`] : [`${a}+${b}`, `${b}+${a}`]) : null));
+      if (row.some(Boolean)) { rowLabels.push(a); rows.push(row); }
+    }
+  } else {
+    for (let a = 11; a <= 20; a++) { rowLabels.push(a); rows.push(colLabels.map(b => cell([`${a}-${b}`]))); }
+  }
+  return { rowLabels, colLabels, rows };
+}
+
 // Langelio spalvos lygis: 'none' (nebandyta), 'good', 'ok', 'weak', 'bad'.
 export function cellLevel(cell) {
   if (!cell || !cell.n) return 'none';

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseKey, summarize, byGroup, weakFacts, slowFacts, factGrid, cellLevel, recentTests, secondsText,
+  parseKey, summarize, byGroup, weakFacts, slowFacts, factGrid, factGrid20, cellLevel, recentTests, secondsText,
 } from '../js/parent.js';
 import { makeProblem, makeCompare, statKey } from '../js/math.js';
 
@@ -80,4 +80,22 @@ test('recentTests ir secondsText', () => {
   assert.equal(r.length, 10);
   assert.equal(r[9].ratio, 0.3);
   assert.equal(secondsText(6500), '6,5 s');
+});
+
+test('factGrid20: tik per dešimtį, 8 + 5 ir 5 + 8 kartu', () => {
+  const st = { '8+5': { n: 2, err: 1, ms: 8000 }, '5+8': { n: 2, err: 0, ms: 4000 }, '15-3': { n: 1, err: 0, ms: 3000 } };
+  const add = factGrid20(st, '+');
+  assert.equal(add.colLabels.length, 11);
+  assert.equal(add.rowLabels[0], 6); // 6 + 5 – pirmoji eilutė su suma > 10
+  const r8 = add.rows[add.rowLabels.indexOf(8)];
+  assert.equal(r8[5].n, 4);
+  assert.equal(r8[5].err, 1);
+  assert.equal(r8[2], null); // 8 + 2 = 10 – ne per dešimtį
+  assert.equal(r8[9], null); // 9 > 8 – rodoma eilutėje 9
+  const r15 = add.rows[add.rowLabels.indexOf(15)];
+  assert.equal(r15[6], null); // 21 > 20
+  const sub = factGrid20(st, '-');
+  assert.deepEqual(sub.rowLabels, [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+  assert.equal(sub.rows[4][3].n, 1);
+  assert.equal(sub.rows[0][0].n, 0);
 });

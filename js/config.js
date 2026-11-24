@@ -52,6 +52,12 @@ export const SPEEDS = [
   { id: 'falcon', name: 'Sakalas', emoji: '🦅', seconds: 7, stars: 3 },
 ];
 
+// Greičio ženkliukas istorijai (taip pat ir pašalintiems senesniems greičiams).
+export function speedEmoji(id) {
+  const sp = SPEEDS.find(x => x.id === id);
+  return sp ? sp.emoji : { turtle: '🐢', rabbit: '🐇' }[id] || '';
+}
+
 // Rašymo režime už teisingą atsakymą (rašyti sunkiau nei bakstelėti).
 export const WRITE_STARS = 2;
 
