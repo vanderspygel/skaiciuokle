@@ -95,7 +95,7 @@ Pradžios ekrane, virš režimų, – jungiklis **Iki 10 / Iki 20** (pasirinkima
 Lygiai iki 20 (`LEVELS_20` faile `js/config.js`):
 1. Iki 20 be perėjimo per dešimtį (13 + 4, 17 − 4, sudėtis ir atimtis maišytai) – su dviem dešimties rėmeliais;
 2. Sudėtis ir atimtis iki 20 (ir per dešimtį: 8 + 5, 13 − 5) – su rėmeliais;
-3. Kas pasislėpė? (13 + ? = 17, ? − 5 = 8) · 4. Draugai iki 20 (14 + ? = 20) ir palyginimas.
+3. Draugai iki 20 (14 + ? = 20) ir palyginimas · 4. Kas pasislėpė? (13 + ? = 17, ? − 5 = 8) kartu su visais ankstesniais.
 
 Faktų atrankos (`teen`, `teenNoCross`, `teenCross`) – `FACT_FILTERS` faile `js/math.js`. Atimtyje atimamasis ne didesnis už 10. Draugiškų skaičių iki 20 statistika laikoma atskirai (`draugas20:14`).
 

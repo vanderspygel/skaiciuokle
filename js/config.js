@@ -22,8 +22,8 @@ export const LEVELS = [
 export const LEVELS_20 = [
   { id: 1, title: 'Iki 20 be perėjimo', icon: '🔢', kinds: ['add', 'sub'], limits: L20, filter: 'teenNoCross', visual: true },
   { id: 2, title: 'Sudėtis ir atimtis iki 20', icon: '🔟', kinds: ['add', 'sub'], limits: L20, filter: 'teen', visual: true },
-  { id: 3, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub'], limits: L20, filter: 'teen', visual: false },
-  { id: 4, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], limits: L20, filter: 'teen', friendTarget: 20, visual: false },
+  { id: 3, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'friend', 'compare'], limits: L20, filter: 'teen', friendTarget: 20, visual: false },
+  { id: 4, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], limits: L20, filter: 'teen', friendTarget: 20, visual: false },
 ];
 
 export const GAMES = {
