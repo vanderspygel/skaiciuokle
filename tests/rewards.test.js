@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   addStars, spendStars, stageFor, updateStreak, recordLevelAnswer, markPlayed,
-  checkAchievements, unlockedKinds,
+  checkAchievements, unlockedKinds, addFriend, switchFriend, friendStage, allFriends,
 } from '../js/rewards.js';
 import { migrate, defaultState, SCHEMA_VERSION } from '../js/storage.js';
 import { testRating, testBonus } from '../js/config.js';
@@ -97,4 +97,61 @@ test('migracija užpildo trūkstamus laukus', () => {
   assert.equal(s.counters.fast, 0);
   assert.equal(s.schemaVersion, SCHEMA_VERSION);
   assert.equal(migrate(null).stars, 0);
+});
+
+test('senas išsaugojimas: padarėlis paveldi visą augimą', () => {
+  const old = { schemaVersion: 1, monster: { name: 'Bubu', parts: {}, wear: {} }, stars: 30, totalEarned: 800 };
+  const s = migrate(JSON.parse(JSON.stringify(old)));
+  assert.equal(s.monster.grow, 800);
+  assert.equal(s.monster.kind, 'monster');
+  assert.ok(s.monster.uid);
+  assert.deepEqual(s.friends, []);
+  assert.equal(friendStage(s.monster, s).id, 'big');
+});
+
+test('auga tik aktyvus draugas, kiekvienas atskirai', () => {
+  const s = defaultState();
+  addFriend(s, { name: 'A', parts: {}, wear: {} });
+  addStars(s, 300);
+  const a = s.monster;
+  addFriend(s, { name: 'B', parts: {}, wear: {} });
+  assert.equal(s.monster.name, 'B');
+  assert.equal(friendStage(s.monster, s).id, 'egg');
+  assert.equal(addStars(s, 20).id, 'baby');
+  assert.equal(a.grow, 300);
+  assert.equal(s.monster.grow, 20);
+  assert.equal(s.totalEarned, 320);
+  assert.ok(switchFriend(s, a.uid));
+  assert.equal(s.monster, a);
+  assert.equal(s.friends.length, 1);
+  assert.equal(s.friends[0].name, 'B');
+  assert.equal(allFriends(s).length, 2);
+  checkAchievements(s);
+  assert.ok(s.badges.friend2);
+});
+
+test('daugiau augimo etapų po „Didelis“', () => {
+  const s = defaultState();
+  addFriend(s, { name: 'A', parts: {}, wear: {} });
+  addStars(s, 700);
+  assert.equal(friendStage(s.monster, s).id, 'big');
+  assert.equal(addStars(s, 500).id, 'strong');
+  addStars(s, 5000);
+  assert.equal(friendStage(s.monster, s).id, 'legend');
+});
+
+test('kambariai: pirmasis visada yra, kiti sukuriami nupirkus', async () => {
+  const { hasRoom, roomState, currentRoomId, ownedRooms } = await import('../js/rooms.js');
+  const s = migrate({ schemaVersion: 1, room: { wallpaper: 'wall-dots', floor: 'floor-wood', items: [{ id: 'f-ball', x: 1, y: 2 }] }, prefs: {} });
+  assert.deepEqual(s.rooms, {});
+  assert.equal(currentRoomId(s), 'home');
+  assert.equal(roomState(s, 'home').wallpaper, 'wall-dots');
+  assert.ok(!hasRoom(s, 'kitchen'));
+  s.prefs.room = 'kitchen';
+  assert.equal(currentRoomId(s), 'home');
+  s.owned.push('room:kitchen');
+  assert.equal(currentRoomId(s), 'kitchen');
+  assert.equal(roomState(s, 'kitchen').wallpaper, 'wall-kitchen');
+  assert.deepEqual(roomState(s, 'kitchen').items.map(i => i.id), ['f-teapot', 'f-plates']);
+  assert.equal(ownedRooms(s).length, 2);
 });

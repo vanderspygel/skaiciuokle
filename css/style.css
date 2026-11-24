@@ -198,7 +198,7 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .mode-mental:active { box-shadow: 0 2px 0 #d9701a; }
 .mode-test:active { box-shadow: 0 2px 0 #26914f; }
 
-.home-more { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.home-more { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 16px; }
 .btn-small-tile { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 22px; }
 .tile-icon { font-size: 34px; }
 
@@ -501,6 +501,20 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .wall-sky { background: radial-gradient(ellipse 60px 26px at 20% 30%, #fff 98%, transparent), radial-gradient(ellipse 80px 30px at 70% 20%, #fff 98%, transparent), radial-gradient(ellipse 50px 22px at 85% 55%, #fff 98%, transparent), linear-gradient(#8fd0ff, #e0f4ff); }
 .wall-night { background: radial-gradient(circle, #fff7b0 1.5px, transparent 2.5px) 0 0 / 46px 46px, radial-gradient(circle, #fff 1px, transparent 2px) 20px 24px / 60px 60px, linear-gradient(#26235a, #4a3f8f); }
 .wall-candy { background: repeating-linear-gradient(45deg, #ffd6e8 0 24px, #fff 24px 48px, #d6f0ff 48px 72px, #fff 72px 96px); }
+.wall-stripes { background: repeating-linear-gradient(90deg, #ffd6e8 0 34px, #fff1b8 34px 68px, #d4f5c4 68px 102px, #c9e3ff 102px 136px, #eee2ff 136px 170px); }
+.wall-forest { background: radial-gradient(ellipse 40px 70px at 12% 100%, #5fbf4a 98%, transparent), radial-gradient(ellipse 50px 90px at 40% 100%, #4fa82f 98%, transparent), radial-gradient(ellipse 44px 76px at 72% 100%, #6fcf57 98%, transparent), radial-gradient(ellipse 36px 64px at 92% 100%, #4fa82f 98%, transparent), linear-gradient(#bfeaff, #e8f8d8); }
+.floor-checker { background: conic-gradient(#2b2340 25%, #fff 0 50%, #2b2340 0 75%, #fff 0) 0 0 / 56px 56px; }
+.floor-sand { background: radial-gradient(circle, #e6c27a 1.5px, transparent 2.5px) 0 0 / 18px 18px, #f6dca0; }
+.floor-gold { background: repeating-linear-gradient(90deg, #ffd23f 0 60px, #f2b705 60px 64px), #ffd23f; }
+.wall-kitchen { background: linear-gradient(transparent 70%, #ffb3b3 70% 74%, transparent 74%), conic-gradient(#fff 25%, #e8f6ff 0 50%, #fff 0 75%, #e8f6ff 0) 0 0 / 40px 40px; }
+.wall-bath { background: repeating-linear-gradient(0deg, #ffffff 0 2px, transparent 2px 36px), repeating-linear-gradient(90deg, #ffffff 0 2px, transparent 2px 36px), #bfe7ff; }
+.floor-bath { background: conic-gradient(#5aa9ff 25%, #fff 0 50%, #5aa9ff 0 75%, #fff 0) 0 0 / 40px 40px; }
+.wall-planks { background: repeating-linear-gradient(0deg, #c98f55 0 34px, #a86b3a 34px 37px); }
+.wall-castle { background: linear-gradient(90deg, #8f8aa6 2px, transparent 2px) 0 0 / 70px 36px, linear-gradient(90deg, #8f8aa6 2px, transparent 2px) 35px 36px / 70px 36px, repeating-linear-gradient(0deg, #8f8aa6 0 2px, #b7b2cc 2px 36px); }
+.floor-stone { background: radial-gradient(ellipse 26px 14px, #9b96b0 96%, transparent) 0 0 / 60px 34px, radial-gradient(ellipse 26px 14px, #a7a2bc 96%, transparent) 30px 17px / 60px 34px, #7d7894; }
+.wall-sea { background: radial-gradient(circle, rgba(255, 255, 255, .55) 4px, transparent 5px) 10px 20px / 70px 90px, radial-gradient(circle, rgba(255, 255, 255, .4) 7px, transparent 8px) 40px 60px / 110px 120px, linear-gradient(#5ad0ff, #1f6fbf); }
+.wall-space { background: radial-gradient(circle, #fff 1.5px, transparent 2.5px) 0 0 / 40px 40px, radial-gradient(circle, #ffd23f 2px, transparent 3px) 20px 25px / 90px 90px, radial-gradient(circle at 80% 30%, #ff9f45 30px, transparent 32px), linear-gradient(#0c0a2a, #2a1f6a); }
+.floor-metal { background: radial-gradient(circle, #9aa6c0 3px, transparent 4px) 0 0 / 50px 50px, repeating-linear-gradient(90deg, #c9d3e6 0 80px, #aeb9d0 80px 83px); }
 .floor-wood { background: repeating-linear-gradient(90deg, #dba56c 0 70px, #c98f55 70px 73px); }
 .floor-grass { background: repeating-linear-gradient(90deg, #8fd16a 0 18px, #82c75c 18px 36px); }
 .floor-tiles { background: conic-gradient(#fff 25%, #ffd6e0 0 50%, #fff 0 75%, #ffd6e0 0) 0 0 / 64px 64px; }
@@ -583,3 +597,38 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 @media (prefers-reduced-motion: reduce) {
   .mon .mon-breathe, .mon .mon-eyes, .track-walker svg { animation: none; }
 }
+
+/* ---------- Vyresnių etapų papuošimai ---------- */
+.fx-spark { transform-box: fill-box; transform-origin: center; animation: twinkle 1.8s ease-in-out infinite; }
+.fx-glow { animation: fx-pulse 3s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .25; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes fx-pulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+
+/* ---------- Draugai ---------- */
+.friends-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; padding: 16px; overflow-y: auto; }
+.friend-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 10px 14px; background: #fff; border: 3px solid var(--line); border-radius: 22px; font: inherit; color: inherit; }
+.friend-card.active { border-color: #ffb547; box-shadow: 0 0 0 4px rgba(255, 181, 71, .35); }
+.friend-card .friend-pic { width: 130px; height: 150px; }
+.friend-card .friend-pic svg { width: 100%; height: 100%; }
+.friend-name { font-weight: 900; font-size: 1.2rem; }
+.friend-stage { font-size: .95rem; opacity: .8; }
+.friend-card .growth { width: 100%; }
+.friend-tag { font-size: .85rem; font-weight: 800; color: #b26b00; }
+.friend-card.add { justify-content: center; border-style: dashed; min-height: 240px; font-size: 1.1rem; font-weight: 800; }
+.friend-card.add .plus { font-size: 3rem; }
+.friends-hint { padding: 0 16px; text-align: center; opacity: .8; }
+.home-stage { position: relative; }
+.home-friends { position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
+.home-friend { width: 78px; height: 88px; padding: 2px; border-radius: 16px; background: rgba(255, 255, 255, .7); border: 2px solid var(--line); }
+.home-friend svg { width: 100%; height: 100%; }
+.stage-steps { display: flex; gap: 0; justify-content: center; font-size: .9rem; margin-top: 2px; }
+.stage-steps span { opacity: .3; filter: grayscale(1); }
+.stage-steps span.done { opacity: 1; filter: none; }
+
+/* ---------- Kambarių mygtukai ---------- */
+.room-tabs { display: flex; gap: 8px; padding-bottom: 10px; overflow-x: auto; flex-shrink: 0; }
+.room-tab { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-size: 17px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+.room-tab-icon { font-size: 24px; }
+.room-tab.active { background: #fff3d6; border-color: #ffb547; }
+.room-tab.drop-hover { background: #d4f5c4; border-color: #4fa82f; transform: scale(1.1); }
+.room-tab-add { border-style: dashed; }

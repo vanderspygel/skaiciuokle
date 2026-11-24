@@ -10,7 +10,7 @@ import { LEVELS, LIMITS, SPEEDS, FAST_BONUS, WRITE_STARS } from '../config.js';
 import { Scheduler, makeChoices, checkAnswer, recordResult } from '../math.js';
 import { buildTemplates, recognizeNumber, addSample } from '../handwriting.js';
 import { drawPad } from '../drawpad.js';
-import { updateStreak, recordLevelAnswer, unlockedKinds, stageFor } from '../rewards.js';
+import { updateStreak, recordLevelAnswer, unlockedKinds, friendStage } from '../rewards.js';
 import { monsterSVG } from '../monster.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
@@ -63,7 +63,7 @@ export function render(ctx, params) {
 
   let track = null, walker = null;
   if (speed) {
-    const st = stageFor(s.totalEarned);
+    const st = friendStage(s.monster, s);
     walker = h('div.track-walker', null, svgEl(monsterSVG(s.monster, { stage: st.id })));
     track = h('div.track', { 'aria-hidden': 'true' },
       h('div.track-path'),

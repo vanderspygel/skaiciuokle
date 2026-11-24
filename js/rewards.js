@@ -16,14 +16,67 @@ export function stageFor(totalEarned) {
   return STAGES[stageIndex(totalEarned)];
 }
 
-// Prideda žvaigždučių. Išleidimas augimo neatima, todėl totalEarned tik auga.
-// Grąžina naują etapą, jei padarėlis paaugo.
+// ---------- Draugai ----------
+// state.monster – draugas, su kuriuo dabar žaidžiama (jis auga);
+// state.friends – kiti draugai (jie laukia ir neauga).
+// Kiekvienas draugas auga atskirai: monster.grow = žvaigždutės, uždirbtos su juo.
+
+export function allFriends(state) {
+  return [state.monster, ...(state.friends || [])].filter(Boolean);
+}
+
+export function growOf(monster, state) {
+  if (!monster) return state ? state.totalEarned : 0;
+  return typeof monster.grow === 'number' ? monster.grow : 0;
+}
+
+export function friendStage(monster, state) {
+  return stageFor(growOf(monster, state));
+}
+
+// Padaro kitą draugą aktyviu (su juo žaidžiama, jis auga).
+export function switchFriend(state, uid) {
+  const i = (state.friends || []).findIndex(f => f.uid === uid);
+  if (i < 0) return false;
+  const next = state.friends[i];
+  state.friends.splice(i, 1);
+  if (state.monster) {
+    // Kambaryje draugai pasikeičia vietomis.
+    const pos = state.room.monster;
+    state.room.monster = next.pos || { x: 30, y: 72 };
+    state.monster.pos = pos;
+    state.friends.unshift(state.monster);
+  }
+  delete next.pos;
+  state.monster = next;
+  return true;
+}
+
+// Naujas draugas tampa aktyviu; ankstesnis eina pas kitus draugus.
+export function addFriend(state, friend) {
+  friend.uid = friend.uid || 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  friend.grow = friend.grow || 0;
+  if (state.monster) {
+    // Ankstesnis draugas pasitraukia į šoną, kad kambaryje nesusidėtų vienas ant kito.
+    const n = state.friends.length;
+    state.monster.pos = { x: [18, 82, 30, 70, 10, 90, 40, 60][n % 8], y: 62 + (n * 11) % 30 };
+    state.room.monster = { x: 50, y: 72 };
+    state.friends.unshift(state.monster);
+  }
+  state.monster = friend;
+  return friend;
+}
+
+// Prideda žvaigždučių. Išleidimas augimo neatima: totalEarned ir monster.grow tik auga.
+// Auga tik aktyvus draugas. Grąžina naują etapą, jei jis paaugo.
 export function addStars(state, n) {
   if (!n) return null;
-  const before = stageIndex(state.totalEarned);
+  const m = state.monster;
+  const before = stageIndex(growOf(m, state));
   state.stars += n;
   state.totalEarned += n;
-  const after = stageIndex(state.totalEarned);
+  if (m) m.grow = growOf(m) + n;
+  const after = stageIndex(growOf(m, state));
   return after > before ? STAGES[after] : null;
 }
 
@@ -130,9 +183,25 @@ export const ACHIEVEMENTS = [
   { id: 'writer', icon: '✍️', name: 'Rašytoja', desc: '20 teisingų parašytų atsakymų', reward: 10, check: s => s.counters.written >= 20 },
   { id: 'writer100', icon: '📜', name: 'Raštininkė', desc: '100 teisingų parašytų atsakymų', reward: 20, check: s => s.counters.written >= 100 },
   { id: 'snack', icon: '🍪', name: 'Smaližius', desc: 'Pavaišinai padarėlį 5 kartus', reward: 3, check: s => s.counters.fed >= 5 },
-  { id: 'hatch', icon: '🐣', name: 'Išsiritau!', desc: 'Padarėlis išsirito', reward: 3, check: s => stageIndex(s.totalEarned) >= 1 },
-  { id: 'grown', icon: '🌟', name: 'Užaugau!', desc: 'Padarėlis užaugo didelis', reward: 20, check: s => stageIndex(s.totalEarned) >= STAGES.length - 1 },
+  { id: 'hatch', icon: '🐣', name: 'Išsiritau!', desc: 'Padarėlis išsirito', reward: 3, check: s => maxStage(s) >= 1 },
+  { id: 'grown', icon: '🌟', name: 'Užaugau!', desc: 'Padarėlis užaugo didelis', reward: 20, check: s => maxStage(s) >= stageId('big') },
+  { id: 'friend2', icon: '🤝', name: 'Naujas draugas', desc: 'Susiradai antrą draugą', reward: 5, check: s => allFriends(s).length >= 2 },
+  { id: 'friends4', icon: '👫', name: 'Draugų būrys', desc: 'Turi 4 draugus', reward: 15, check: s => allFriends(s).length >= 4 },
+  { id: 'friends8', icon: '🎉', name: 'Didelė šeima', desc: 'Turi 8 draugus', reward: 30, check: s => allFriends(s).length >= 8 },
+  { id: 'twoGrown', icon: '🌳', name: 'Du dideli', desc: 'Du draugai užaugo dideli', reward: 20, check: s => allFriends(s).filter(f => stageIndex(growOf(f)) >= stageId('big')).length >= 2 },
+  { id: 'super', icon: '⭐', name: 'Superžvaigždė', desc: 'Draugas tapo superžvaigžde', reward: 25, check: s => maxStage(s) >= stageId('super') },
+  { id: 'legend', icon: '👑', name: 'Legenda', desc: 'Draugas tapo legenda', reward: 50, check: s => maxStage(s) >= stageId('legend') },
 ];
+
+function stageId(id) {
+  return STAGES.findIndex(st => st.id === id);
+}
+
+function maxStage(s) {
+  const all = allFriends(s);
+  if (!all.length) return stageIndex(s.totalEarned);
+  return Math.max(...all.map(f => stageIndex(growOf(f))));
+}
 
 // Patikrina pasiekimus; naujiems prideda premiją. Grąžina naujų sąrašą.
 // Premija gali atrakinti kitus pasiekimus (pvz., „Užaugau!“), todėl kartojam.

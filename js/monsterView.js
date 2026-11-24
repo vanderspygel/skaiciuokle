@@ -1,17 +1,17 @@
 // Padarėlio komponentas su reakcijomis (šokinėja, apsisuka, padrąsina).
 
 import { monsterSVG } from './monster.js';
-import { stageFor } from './rewards.js';
+import { friendStage } from './rewards.js';
 import { h, svgEl, pulse } from './ui.js';
 
 const GIGGLES = ['Hi hi hi!', 'Kutena!', 'Cha cha!', 'Labas!', 'Oho!'];
 
 export function monsterView(ctx, { className = '', interactive = true, monster, stage } = {}) {
   const m = monster || ctx.state.monster;
-  const st = stage || stageFor(ctx.state.totalEarned);
+  const st = stage || friendStage(m, ctx.state);
   const bubble = h('div.bubble');
   const wrap = h('div.monster ' + className);
-  let svg = svgEl(monsterSVG(m, { stage: st.id, scale: st.scale }));
+  let svg = svgEl(monsterSVG(m, { stage: st.id, scale: st.scale, fx: st.fx }));
   wrap.append(svg, bubble);
 
   let bubbleTimer;
@@ -28,8 +28,9 @@ export function monsterView(ctx, { className = '', interactive = true, monster, 
       if (cls) pulse(wrap, cls, 1000);
     },
     refresh(newMonster, newStage) {
-      const s = newStage || stageFor(ctx.state.totalEarned);
-      const fresh = svgEl(monsterSVG(newMonster || ctx.state.monster, { stage: s.id, scale: s.scale }));
+      const nm = newMonster || monster || ctx.state.monster;
+      const s = newStage || friendStage(nm, ctx.state);
+      const fresh = svgEl(monsterSVG(nm, { stage: s.id, scale: s.scale, fx: s.fx }));
       svg.replaceWith(fresh);
       svg = fresh;
     },
@@ -42,4 +43,10 @@ export function monsterView(ctx, { className = '', interactive = true, monster, 
     });
   }
   return view;
+}
+
+// Mažas draugo paveikslėlis (SVG eilutė) pagal jo paties augimą.
+export function friendSVG(ctx, m, extra = {}) {
+  const st = friendStage(m, ctx.state);
+  return monsterSVG(m, { stage: st.id, scale: st.scale, fx: st.fx, ...extra });
 }
