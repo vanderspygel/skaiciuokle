@@ -66,6 +66,16 @@ test('„10“ skaidomas į du skaitmenis', () => {
   assert.equal(r.value, 10);
 });
 
+test('iki 20: „13“ ir „20“ atpažįstami, „20“ iki 10 – ne', () => {
+  const shift = (g, dx) => g.map(st => st.map(([x, y]) => [x + dx, y]));
+  const tpl = buildTemplates();
+  assert.equal(recognizeNumber([...HAND[1], ...shift(HAND[3], 110)], tpl, 20).value, 13);
+  const twenty = [...HAND[2], ...shift(HAND[0], 120)];
+  assert.equal(recognizeNumber(twenty, tpl, 20).value, 20);
+  assert.equal(recognizeNumber([...HAND[1], ...shift(HAND[0], 110)], tpl, 20).value, 10);
+  assert.notEqual(recognizeNumber(twenty, tpl, 10).value, 20);
+});
+
 test('dviejų brūkšnių skaitmuo (4, 7) lieka vienas', () => {
   assert.equal(splitDigits(HAND[4]).length, 1);
   assert.equal(splitDigits(HAND[7]).length, 1);

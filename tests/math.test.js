@@ -175,3 +175,73 @@ test('mišrūs tipai visi pasirodo', () => {
   for (let i = 0; i < 300; i++) kinds.add(s.next().kind);
   assert.equal(kinds.size, 6);
 });
+
+// ---------- Žaidimas iki 20 ----------
+
+const L20 = { maxNumber: 20, maxResult: 20 };
+
+test('iki 20 be perėjimo: rezultatas 11–20, per dešimtį neperšokama', () => {
+  const add = enumerateFacts('add', L20, 'teenNoCross');
+  assert.ok(add.length > 0);
+  for (const f of add) {
+    assert.ok(f.answer > 10 && f.answer <= 20, f.key);
+    assert.ok((f.a % 10) + (f.b % 10) <= 10, f.key);
+  }
+  assert.ok(add.some(f => f.key === '13+4'));
+  assert.ok(!add.some(f => f.key === '8+5'));
+  const sub = enumerateFacts('sub', L20, 'teenNoCross');
+  for (const f of sub) {
+    assert.ok(f.a > 10 && f.b <= 10 && f.a % 10 >= f.b % 10, f.key);
+  }
+  assert.ok(sub.some(f => f.key === '17-4'));
+  assert.ok(!sub.some(f => f.key === '13-5'));
+});
+
+test('iki 20 per dešimtį: 8 + 5, 13 − 5', () => {
+  const add = enumerateFacts('add', L20, 'teenCross');
+  assert.ok(add.some(f => f.key === '8+5'));
+  for (const f of add) assert.ok(f.a < 10 && f.b < 10 && f.answer > 10, f.key);
+  const sub = enumerateFacts('sub', L20, 'teenCross');
+  assert.ok(sub.some(f => f.key === '13-5'));
+  for (const f of sub) assert.ok(f.answer >= 0 && f.answer < f.a && f.a % 10 < f.b, f.key);
+});
+
+test('draugiški skaičiai iki 20 turi savo statistikos raktus', () => {
+  const f = enumerateFacts('friend', L20, null, 20);
+  assert.equal(f[0].a, 10);
+  assert.ok(f.every(p => p.a + p.answer === 20 && p.key.startsWith('draugas20:')));
+  assert.equal(enumerateFacts('friend', L10)[3].key, 'draugas:3');
+});
+
+test('keli lygiai kartu: užduotys iš abiejų, be dublikatų', () => {
+  const s = new Scheduler({
+    sources: [
+      { kinds: ['add'], limits: L20, filter: 'teenNoCross' },
+      { kinds: ['add', 'compare'], limits: L20, filter: 'teenCross' },
+    ],
+    rng: mulberry32(3),
+  });
+  const keys = s.facts.add.map(f => f.key);
+  assert.equal(new Set(keys).size, keys.length);
+  assert.ok(keys.includes('13+4') && keys.includes('8+5'));
+  let maxSeen = 0;
+  for (let i = 0; i < 300; i++) {
+    const p = s.next();
+    if (p.kind === 'compare') maxSeen = Math.max(maxSeen, p.left.value, p.right.value);
+    else assert.ok(p.answer > 10 && p.answer <= 20, p.key);
+  }
+  assert.ok(maxSeen > 10, 'palyginimas naudoja ribas iki 20');
+});
+
+test('visi lygiai iki 20 sukuria užduočių ribose', async () => {
+  const { LEVELS_20 } = await import('../js/config.js');
+  for (const l of LEVELS_20) {
+    const s = new Scheduler({ sources: [l], rng: mulberry32(l.id) });
+    for (let i = 0; i < 200; i++) {
+      const p = s.next();
+      if (p.kind === 'compare') continue;
+      assert.ok(Number.isInteger(p.answer) && p.answer >= 0 && p.answer <= 20, `${l.id}: ${p.key}`);
+      for (const n of p.parts) if (typeof n === 'number') assert.ok(n >= 0 && n <= 20, `${l.id}: ${p.key}`);
+    }
+  }
+});

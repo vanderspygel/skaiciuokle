@@ -1,19 +1,42 @@
 // Visi žaidimo nustatymai vienoje vietoje.
 
-// Skaičių ribos. Norint pereiti iki 20 – pakeisti čia.
-export const LIMITS = { maxNumber: 10, maxResult: 10 };
+// Du atskiri žaidimai: „Iki 10“ ir „Iki 20“. Kiekvienas turi savo lygius ir
+// savo pažangą; mintinai, kontrolinis ir rašymas naudoja pasirinkto žaidimo
+// atrakintus lygius. Pasirenkama pradžios ekrane.
+const L10 = { maxNumber: 10, maxResult: 10 };
+const L20 = { maxNumber: 20, maxResult: 20 };
 
 // Įprasto skaičiavimo lygiai.
-// kinds: kokių tipų užduotys; visual: ar rodyti dešimties rėmelį.
-// Atsakymai visada renkami skaičių mygtukais 0–10 (palyginimas – dviem mygtukais).
+// kinds: kokių tipų užduotys; visual: ar rodyti dešimties rėmelį;
+// filter: kurie faktai (žr. FACT_FILTERS math.js); friendTarget: draugiški skaičiai iki ...
+// Atsakymai renkami visais žaidimo skaičiais (0–10 arba 0–20), palyginimas – dviem mygtukais.
 export const LEVELS = [
   { id: 1, title: 'Sudėtis iki 5', icon: '➕', kinds: ['add'], limits: { maxNumber: 5, maxResult: 5 }, visual: true },
-  { id: 2, title: 'Sudėtis iki 10', icon: '➕', kinds: ['add'], visual: true },
-  { id: 3, title: 'Atimtis iki 10', icon: '➖', kinds: ['sub'], visual: true },
-  { id: 4, title: 'Sudėtis ir atimtis', icon: '🔢', kinds: ['add', 'sub'], visual: false },
-  { id: 5, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub'], visual: false },
-  { id: 6, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], visual: false },
+  { id: 2, title: 'Sudėtis iki 10', icon: '➕', kinds: ['add'], limits: L10, visual: true },
+  { id: 3, title: 'Atimtis iki 10', icon: '➖', kinds: ['sub'], limits: L10, visual: true },
+  { id: 4, title: 'Sudėtis ir atimtis', icon: '🔢', kinds: ['add', 'sub'], limits: L10, visual: false },
+  { id: 5, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub'], limits: L10, visual: false },
+  { id: 6, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], limits: L10, visual: false },
 ];
+
+export const LEVELS_20 = [
+  { id: 1, title: 'Iki 20 be perėjimo', icon: '🔢', kinds: ['add', 'sub'], limits: L20, filter: 'teenNoCross', visual: true },
+  { id: 2, title: 'Sudėtis ir atimtis iki 20', icon: '🔟', kinds: ['add', 'sub'], limits: L20, filter: 'teen', visual: true },
+  { id: 3, title: 'Draugai ir palyginimas', icon: '🤝', kinds: ['add', 'sub', 'friend', 'compare'], limits: L20, filter: 'teen', friendTarget: 20, visual: false },
+  { id: 4, title: 'Kas pasislėpė?', icon: '❓', kinds: ['add', 'sub', 'missAdd', 'missSub', 'friend', 'compare'], limits: L20, filter: 'teen', friendTarget: 20, visual: false },
+];
+
+export const GAMES = {
+  10: { id: 10, title: 'Iki 10', levels: LEVELS, limits: L10, progressKey: 'progress' },
+  20: { id: 20, title: 'Iki 20', levels: LEVELS_20, limits: L20, progressKey: 'progress20' },
+};
+
+// Bendra visų žaidimų riba (rašysenos atpažinimui ir pan.).
+export const LIMITS = L20;
+
+export function gameFor(state) {
+  return GAMES[state?.prefs?.game] || GAMES[10];
+}
 
 // Kitas lygis atrakinamas, kai lygyje surinkta UNLOCK_CORRECT teisingų
 // ir paskutinių UNLOCK_WINDOW atsakymų tikslumas ≥ UNLOCK_ACCURACY.
