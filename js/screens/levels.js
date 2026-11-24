@@ -1,14 +1,16 @@
 import { h } from '../ui.js';
-import { LEVELS, UNLOCK_CORRECT } from '../config.js';
-import { levelProgress } from '../rewards.js';
+import { UNLOCK_CORRECT, gameFor } from '../config.js';
+import { levelProgress, gameProgress } from '../rewards.js';
 import { topBar, screen } from './common.js';
 
 export function render(ctx) {
   const s = ctx.state;
-  const cards = LEVELS.map(l => {
-    const locked = l.id > s.progress.unlocked;
-    const p = levelProgress(s, l.id);
-    const isCurrent = l.id === s.progress.unlocked && l.id < LEVELS.length;
+  const game = gameFor(s);
+  const unlocked = gameProgress(s, game).unlocked;
+  const cards = game.levels.map(l => {
+    const locked = l.id > unlocked;
+    const p = levelProgress(s, l.id, game);
+    const isCurrent = l.id === unlocked && l.id < game.levels.length;
     let footer = null;
     if (locked) footer = h('div.level-lock', null, '🔒');
     else if (isCurrent) {
@@ -26,7 +28,7 @@ export function render(ctx) {
   });
 
   const el = screen('levels',
-    topBar(ctx, { title: 'Skaičiuoti' }),
+    topBar(ctx, { title: `Skaičiuoti ${game.title.toLowerCase()}` }),
     h('div.level-grid', null, cards));
   return { el };
 }

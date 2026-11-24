@@ -1,7 +1,7 @@
 import { h, svgEl } from '../ui.js';
 import { monsterView, friendSVG } from '../monsterView.js';
 import { friendStage, growOf, switchFriend, dateKey } from '../rewards.js';
-import { STAGES } from '../config.js';
+import { STAGES, GAMES, gameFor } from '../config.js';
 import { screen } from './common.js';
 
 const HELLO = ['Labas!', 'Sveika!', 'Pažaidžiam?', 'Skaičiuojam?'];
@@ -27,6 +27,20 @@ export function render(ctx) {
   const small = (icon, label, onclick) =>
     h('button.btn.btn-small-tile', { onclick }, h('span.tile-icon', null, icon), h('span', null, label));
 
+  // Du žaidimai: skaičiuojam iki 10 arba iki 20. Kiekvienas turi savo lygius.
+  const gameBtns = Object.values(GAMES).map(g => {
+    const b = h('button.btn.game-btn', {
+      'aria-pressed': String(g.id === gameFor(s).id),
+      onclick: () => {
+        s.prefs.game = g.id;
+        ctx.save();
+        gameBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+        mv.react('jump');
+      },
+    }, g.title);
+    return b;
+  });
+
   const el = screen('home',
     h('header.topbar', null,
       h('button.btn.btn-icon', { 'aria-label': 'Padarėlio išvaizda', onclick: () => ctx.go('create') }, '✏️'),
@@ -38,6 +52,7 @@ export function render(ctx) {
       h('div.home-sub', null, `${st.name} · ${idx + 1} iš ${STAGES.length}`),
       growth,
       friendsRow),
+    h('div.game-switch', { role: 'group', 'aria-label': 'Žaidimas' }, gameBtns),
     h('nav.home-modes', null,
       big('🔢', 'Skaičiuoti', 'mode-practice', () => ctx.go('levels')),
       big('🧠', 'Mintinai', 'mode-mental', () => ctx.go('setup', { mode: 'mental' })),

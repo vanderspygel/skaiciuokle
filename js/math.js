@@ -36,7 +36,7 @@ export function shuffle(arr, rng = Math.random) {
 //  sub:     a − b = ?
 //  missAdd: a + ? = c      (b = c − a)
 //  missSub: ? − b = c      (a = b + c)
-//  friend:  a + ? = 10     (draugiški skaičiai)
+//  friend:  a + ? = 10     (draugiški skaičiai; arba iki 20)
 export function makeProblem(kind, a, b, friendTarget = 10) {
   switch (kind) {
     case 'add':
@@ -52,27 +52,43 @@ export function makeProblem(kind, a, b, friendTarget = 10) {
       return { kind, key: `?-${b}=${c}`, a, b, op: '-', answer: a, parts: ['?', '−', b, '=', c] };
     }
     case 'friend':
-      return { kind, key: `draugas:${a}`, a, b: friendTarget - a, op: '+', answer: friendTarget - a, target: friendTarget, parts: [a, '+', '?', '=', friendTarget] };
+      return { kind, key: friendTarget === 10 ? `draugas:${a}` : `draugas${friendTarget}:${a}`, a, b: friendTarget - a, op: '+', answer: friendTarget - a, target: friendTarget, parts: [a, '+', '?', '=', friendTarget] };
     default:
       throw new Error(`Nežinomas tipas: ${kind}`);
   }
 }
 
-// Visi galimi faktai (a, b) tipui pagal ribas.
-export function enumerateFacts(kind, limits = DEFAULT_LIMITS) {
+// Faktų atrankos žaidimui iki 20 (a, b – kaip makeProblem).
+//  teen:        rezultatas ar mažinamasis didesnis už 10;
+//  teenNoCross: be perėjimo per dešimtį (13 + 4, 17 − 4);
+//  teenCross:   per dešimtį (8 + 5, 13 − 5).
+// Atimtyje atimamasis ne didesnis už 10 – pirmokams dviženklis atimamasis per sunku.
+const crosses = (op, a, b) => (op === '+' ? (a % 10) + (b % 10) > 10 : (a % 10) < (b % 10));
+const isTeen = (op, a, b) => (op === '+' ? a + b > 10 && Math.min(a, b) <= 10 : a > 10 && b <= 10);
+export const FACT_FILTERS = {
+  teen: (op, a, b) => isTeen(op, a, b),
+  teenNoCross: (op, a, b) => isTeen(op, a, b) && !crosses(op, a, b),
+  teenCross: (op, a, b) => isTeen(op, a, b) && crosses(op, a, b),
+};
+
+// Visi galimi faktai (a, b) tipui pagal ribas (ir pasirinktą atranką).
+export function enumerateFacts(kind, limits = DEFAULT_LIMITS, filter = null, friendTarget = null) {
+  const keep = filter ? FACT_FILTERS[filter] : null;
+  if (filter && !keep) throw new Error(`Nežinoma atranka: ${filter}`);
   const { maxNumber, maxResult } = limits;
   const out = [];
   if (kind === 'add' || kind === 'missAdd') {
     for (let a = 0; a <= maxNumber; a++)
       for (let b = 0; b <= maxNumber; b++)
-        if (a + b <= maxResult) out.push(makeProblem(kind, a, b));
+        if (a + b <= maxResult && (!keep || keep('+', a, b))) out.push(makeProblem(kind, a, b));
   } else if (kind === 'sub' || kind === 'missSub') {
     for (let a = 0; a <= maxNumber; a++)
       for (let b = 0; b <= a; b++)
-        if (a - b <= maxResult) out.push(makeProblem(kind, a, b));
+        if (a - b <= maxResult && (!keep || keep('-', a, b))) out.push(makeProblem(kind, a, b));
   } else if (kind === 'friend') {
-    const target = Math.min(10, maxResult);
-    for (let a = 0; a <= target; a++) out.push(makeProblem('friend', a, 0, target));
+    const target = Math.min(friendTarget || 10, maxResult);
+    // Iki 20 – nuo 10 (14 + ? = 20), mažesni skaičiai čia per sunkūs.
+    for (let a = target > 10 ? 10 : 0; a <= target; a++) out.push(makeProblem('friend', a, 0, target));
   }
   return out;
 }
@@ -160,15 +176,28 @@ export function pickWeighted(items, weights, rng = Math.random) {
 
 // ---------- Planuoklė ----------
 
+function hasNoKinds(sources) {
+  return !sources || !sources.length || sources.every(src => !src.kinds || !src.kinds.length);
+}
+
 // Parenka kitą užduotį:
 //  • svertinis atsitiktinumas pagal statistiką;
 //  • neteisingai atsakyta užduotis grįžta po 2–4 kitų;
 //  • ta pati užduotis du kartus iš eilės nekartojama.
 export class Scheduler {
-  constructor({ kinds, limits = DEFAULT_LIMITS, stats = {}, rng = Math.random }) {
-    if (!kinds || !kinds.length) throw new Error('Reikia bent vieno užduočių tipo');
-    this.kinds = kinds.slice();
-    this.limits = limits;
+  // sources: [{ kinds, limits, filter, friendTarget }] – keli lygiai kartu
+  // (mintinai ir kontroliniam). Paprastai užtenka kinds + limits.
+  constructor({ kinds, limits = DEFAULT_LIMITS, sources = null, stats = {}, rng = Math.random }) {
+    if (!sources) sources = [{ kinds, limits }];
+    if (hasNoKinds(sources)) throw new Error('Reikia bent vieno užduočių tipo');
+    kinds = [...new Set(sources.flatMap(src => src.kinds))];
+    if (!kinds.length) throw new Error('Reikia bent vieno užduočių tipo');
+    this.kinds = kinds;
+    // Palyginimui – didžiausios ribos iš lygių, kuriuose jis yra.
+    const cmp = sources.filter(src => src.kinds.includes('compare')).map(src => src.limits || DEFAULT_LIMITS);
+    this.limits = cmp.length
+      ? cmp.reduce((m, l) => (l.maxNumber + l.maxResult > m.maxNumber + m.maxResult ? l : m))
+      : (sources[0].limits || DEFAULT_LIMITS);
     this.stats = stats;
     this.rng = rng;
     this.served = 0;
@@ -176,7 +205,17 @@ export class Scheduler {
     this.recent = [];
     this.retries = [];
     this.facts = {};
-    for (const k of this.kinds) if (k !== 'compare') this.facts[k] = enumerateFacts(k, limits);
+    for (const k of this.kinds) {
+      if (k === 'compare') continue;
+      const seen = new Map();
+      for (const src of sources) {
+        if (!src.kinds.includes(k)) continue;
+        for (const f of enumerateFacts(k, src.limits || DEFAULT_LIMITS, src.filter, src.friendTarget)) {
+          if (!seen.has(f.key)) seen.set(f.key, f);
+        }
+      }
+      this.facts[k] = [...seen.values()];
+    }
   }
 
   next() {

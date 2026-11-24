@@ -2,7 +2,7 @@
 // Gryna logika, dirba su būsenos objektu (be UI).
 
 import {
-  LEVELS, STAGES, UNLOCK_CORRECT, UNLOCK_WINDOW, UNLOCK_ACCURACY,
+  LEVELS, GAMES, STAGES, UNLOCK_CORRECT, UNLOCK_WINDOW, UNLOCK_ACCURACY,
   STREAK_BONUS, STREAK_BONUS_EVERY,
 } from './config.js';
 
@@ -99,20 +99,27 @@ export function updateStreak(state, correctFirstTry) {
 
 // ---------- Lygiai ----------
 
-export function levelProgress(state, levelId) {
-  const p = state.progress.levels[levelId] || (state.progress.levels[levelId] = { correct: 0, recent: [] });
+// Kiekvienas žaidimas („Iki 10“, „Iki 20“) turi savo pažangą.
+export function gameProgress(state, game = GAMES[10]) {
+  return state[game.progressKey] || (state[game.progressKey] = { unlocked: 1, levels: {} });
+}
+
+export function levelProgress(state, levelId, game = GAMES[10]) {
+  const gp = gameProgress(state, game);
+  const p = gp.levels[levelId] || (gp.levels[levelId] = { correct: 0, recent: [] });
   return p;
 }
 
 // Įrašo atsakymą lygyje; grąžina naujai atrakintą lygį arba null.
-export function recordLevelAnswer(state, levelId, correctFirstTry) {
-  const p = levelProgress(state, levelId);
+export function recordLevelAnswer(state, levelId, correctFirstTry, game = GAMES[10]) {
+  const gp = gameProgress(state, game);
+  const p = levelProgress(state, levelId, game);
   if (correctFirstTry) p.correct += 1;
   p.recent.push(correctFirstTry ? 1 : 0);
   if (p.recent.length > UNLOCK_WINDOW) p.recent.shift();
-  if (levelId === state.progress.unlocked && levelId < LEVELS.length && canUnlockNext(p)) {
-    state.progress.unlocked = levelId + 1;
-    return LEVELS[levelId];
+  if (levelId === gp.unlocked && levelId < game.levels.length && canUnlockNext(p)) {
+    gp.unlocked = levelId + 1;
+    return game.levels[levelId];
   }
   return null;
 }
@@ -126,11 +133,14 @@ export function canUnlockNext(p) {
   return p.correct >= UNLOCK_CORRECT && accuracy(p) >= UNLOCK_ACCURACY;
 }
 
-// Užduočių tipai iš visų atrakintų lygių (mintinai ir kontroliniam).
-export function unlockedKinds(state) {
-  const kinds = new Set();
-  for (const l of LEVELS) if (l.id <= state.progress.unlocked) l.kinds.forEach(k => kinds.add(k));
-  return [...kinds];
+// Atrakinti žaidimo lygiai – iš jų renkamos užduotys mintinai ir kontroliniam.
+export function unlockedLevels(state, game = GAMES[10]) {
+  const n = gameProgress(state, game).unlocked;
+  return game.levels.filter(l => l.id <= n);
+}
+
+export function unlockedKinds(state, game = GAMES[10]) {
+  return [...new Set(unlockedLevels(state, game).flatMap(l => l.kinds))];
 }
 
 // ---------- Dienos ----------
@@ -178,6 +188,7 @@ export const ACHIEVEMENTS = [
   { id: 'days14', icon: '🌈', name: 'Kasdienis 14', desc: '14 dienų iš eilės', reward: 20, check: s => s.days.best >= 14 },
   { id: 'hunter', icon: '🔍', name: 'Klaidų medžiotojas', desc: 'Pataisei visas kontrolinio klaidas', reward: 5, check: s => s.counters.mistakesCleared >= 1 },
   { id: 'level6', icon: '🎓', name: 'Visi lygiai', desc: 'Atrakinai visus lygius', reward: 15, check: s => s.progress.unlocked >= LEVELS.length },
+  { id: 'level20', icon: '🎖️', name: 'Visi lygiai iki 20', desc: 'Atrakinai visus lygius iki 20', reward: 20, check: s => gameProgress(s, GAMES[20]).unlocked >= GAMES[20].levels.length },
   { id: 'designer', icon: '🎨', name: 'Dizaineris', desc: 'Nupirkai 10 daiktų', reward: 10, check: s => s.counters.purchases >= 10 },
   { id: 'teacher', icon: '🧑‍🏫', name: 'Mokytoja', desc: 'Išmokei padarėlį visų 10 skaitmenų', reward: 5, check: s => Object.keys(s.handwriting.samples).filter(d => s.handwriting.samples[d].length).length >= 10 },
   { id: 'writer', icon: '✍️', name: 'Rašytoja', desc: '20 teisingų parašytų atsakymų', reward: 10, check: s => s.counters.written >= 20 },
