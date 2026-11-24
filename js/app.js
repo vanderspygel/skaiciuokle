@@ -16,8 +16,9 @@ import * as room from './screens/room.js';
 import * as badges from './screens/badges.js';
 import * as teach from './screens/teach.js';
 import * as friends from './screens/friends.js';
+import * as parent from './screens/parent.js';
 
-const SCREENS = { home, create, levels, quiz, setup, results, shop, room, badges, teach, friends };
+const SCREENS = { home, create, levels, quiz, setup, results, shop, room, badges, teach, friends, parent };
 
 const root = document.getElementById('app');
 let current = null;

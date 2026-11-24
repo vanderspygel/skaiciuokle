@@ -76,6 +76,10 @@ Vaiko duomenys (žvaigždutės, padarėlis, pasiekimai) atnaujinant **nepraranda
 
 **Ženkliukai** ekrano viršuje dešinėje (šalia žvaigždučių) – mygtukas **🔄 Iš naujo**. Jis apsaugotas tėvų užduotimi (sudėtis arba atimtis su dviženkliais skaičiais iki 100; suklydus duodama kita užduotis), o paskui dar kartą paklausiama „Ar tikrai?“. Ištrinama viskas: padarėlis, žvaigždutės, ženkliukai, lygiai, kambarys, kontrolinių istorija ir išmokta rašysena.
 
+## Ataskaita tėvams
+
+**Ženkliukai** → **👪 Tėvams** (ta pati tėvų užduotis kaip „Iš naujo“). Rodoma: kiek dienų žaista ir tikslumas iš pirmo karto, tikslumas ir laikas pagal užduočių tipą, sunkiausios (daugiausia klaidų) ir lėčiausios (≥ 6 s be klaidų) užduotys, spalvotos sudėties ir atimties iki 10 lentelės (bakstelėjus langelį – skaičiai), lygių būsena abiejuose žaidimuose, paskutinių 10 kontrolinių eiga ir rašysenos mokymas. Duomenys imami iš jau kaupiamos statistikos (`state.stats`), nauji laukai nepridėti. Logika – `js/parent.js`, ekranas – `js/screens/parent.js`.
+
 ## Testai
 
 ```bash

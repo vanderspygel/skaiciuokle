@@ -559,6 +559,39 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .btn-danger:active:not(:disabled) { box-shadow: 0 1px 0 #b8353a; }
 
 /* ===== Vertikali padėtis ir mažesni ekranai ===== */
+/* ===== Tėvams ===== */
+.topbar-extra { display: flex; gap: 8px; }
+.parent-body { display: flex; flex-direction: column; gap: 16px; padding-bottom: 24px; user-select: text; -webkit-user-select: text; }
+.parent-card { background: #fff; border: 3px solid var(--line); border-radius: 20px; padding: 14px 18px; }
+.parent-card h2 { margin: 0 0 4px; font-size: 24px; }
+.parent-card h3 { margin: 10px 0 6px; font-size: 20px; }
+.parent-hint { margin: 0 0 10px; color: var(--muted); font-size: 16px; font-weight: 600; }
+.parent-empty, .parent-line { margin: 4px 0; font-size: 18px; font-weight: 600; }
+.parent-table { width: 100%; border-collapse: collapse; font-size: 18px; }
+.parent-table th { text-align: left; color: var(--muted); font-size: 15px; font-weight: 700; padding: 4px 8px; border-bottom: 2px solid var(--line); }
+.parent-table td { padding: 6px 8px; border-bottom: 1px solid #f3eee6; font-weight: 600; }
+.parent-table .parent-fact { font-weight: 800; font-size: 20px; white-space: nowrap; }
+.parent-locked td { color: var(--muted); }
+.parent-grid-wrap { overflow-x: auto; }
+.parent-grid { border-collapse: separate; border-spacing: 3px; font-size: 15px; margin: 0 auto; }
+.parent-grid th { color: var(--muted); font-weight: 800; width: 34px; text-align: center; }
+.grid-cell { width: 38px; height: 34px; text-align: center; border-radius: 8px; font-weight: 800; cursor: pointer; }
+.grid-na { background: transparent; cursor: default; }
+.grid-none { background: #f3eee6; color: #b8aec6; }
+.grid-good { background: #bfeccf; color: #1c6b3e; }
+.grid-ok { background: #fff1b8; color: #7a5a00; }
+.grid-weak { background: #ffd3a6; color: #8a4a00; }
+.grid-bad { background: #ffb3b3; color: #8a1f1f; }
+.grid-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 15px; font-weight: 700; color: var(--muted); }
+.grid-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.grid-swatch { width: 18px; height: 18px; border-radius: 5px; display: inline-block; }
+.parent-tests { display: flex; gap: 10px; overflow-x: auto; align-items: flex-end; padding-bottom: 4px; }
+.parent-test { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 56px; }
+.parent-test-bar { width: 30px; height: 90px; background: #f3eee6; border-radius: 8px; display: flex; align-items: flex-end; overflow: hidden; }
+.parent-test-fill { width: 100%; background: var(--primary); border-radius: 8px; }
+.parent-test-score { font-weight: 800; font-size: 16px; }
+.parent-test-meta { font-size: 13px; color: var(--muted); font-weight: 700; white-space: nowrap; }
+
 @media (orientation: portrait) {
   .create-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .create-preview { max-width: 240px; }
@@ -599,6 +632,11 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
   .numpad-wide { grid-template-columns: repeat(10, 1fr); gap: 5px; }
   .numpad-wide .key { font-size: 24px; }
   .badges-summary { grid-template-columns: repeat(2, 1fr); }
+  .topbar-extra .reset-btn { font-size: 15px; padding: 6px 8px; }
+  .parent-table { font-size: 15px; }
+  .parent-table td { white-space: nowrap; padding: 6px 4px; }
+  .grid-cell { width: 26px; height: 26px; font-size: 12px; border-radius: 6px; }
+  .parent-grid th { width: 22px; font-size: 12px; }
   .quiz-monster { display: none; }
 }
 
