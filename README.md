@@ -93,9 +93,9 @@ Ikonas iš naujo sugeneruoti: `python scripts/make_icons.py`.
 Pradžios ekrane, virš režimų, – jungiklis **Iki 10 / Iki 20** (pasirinkimas įsimenamas). Abu žaidimai prieinami iš karto ir turi **atskirus lygius ir atskirą pažangą** (`progress` ir `progress20`); žvaigždutės, padarėlis, ženkliukai ir rašysena bendri. Mintinai, kontrolinis ir rašymas ima užduotis iš pasirinkto žaidimo atrakintų lygių, o skaičių mygtukai būna 0–10 arba 0–20 (iki 20 – eilėmis po dešimt: 1–10, 11–20, 0).
 
 Lygiai iki 20 (`LEVELS_20` faile `js/config.js`):
-1. Sudėtis be perėjimo (13 + 4) · 2. Atimtis be perėjimo (17 − 4) – su dviem dešimties rėmeliais;
-3. Sudėtis per dešimtį (8 + 5) · 4. Atimtis per dešimtį (13 − 5) – su rėmeliais;
-5. Kas pasislėpė? (13 + ? = 17, ? − 5 = 8) · 6. Draugai iki 20 (14 + ? = 20) ir palyginimas.
+1. Iki 20 be perėjimo per dešimtį (13 + 4, 17 − 4, sudėtis ir atimtis maišytai) – su dviem dešimties rėmeliais;
+2. Sudėtis ir atimtis iki 20 (ir per dešimtį: 8 + 5, 13 − 5) – su rėmeliais;
+3. Kas pasislėpė? (13 + ? = 17, ? − 5 = 8) · 4. Draugai iki 20 (14 + ? = 20) ir palyginimas.
 
 Faktų atrankos (`teen`, `teenNoCross`, `teenCross`) – `FACT_FILTERS` faile `js/math.js`. Atimtyje atimamasis ne didesnis už 10. Draugiškų skaičių iki 20 statistika laikoma atskirai (`draugas20:14`).
 

@@ -108,7 +108,7 @@ test('žaidimai iki 10 ir iki 20 turi atskirą pažangą', async () => {
   for (let i = 0; i < 15; i++) recordLevelAnswer(s, 1, true, GAMES[20]);
   assert.equal(gameProgress(s, GAMES[20]).unlocked, 2);
   assert.equal(s.progress.unlocked, 1);
-  assert.deepEqual(unlockedLevels(s, GAMES[20]).map(l => l.title), ['Sudėtis be perėjimo', 'Atimtis be perėjimo']);
+  assert.deepEqual(unlockedLevels(s, GAMES[20]).map(l => l.title), ['Iki 20 be perėjimo', 'Sudėtis ir atimtis iki 20']);
   assert.deepEqual(unlockedKinds(s), ['add']);
 });
 
