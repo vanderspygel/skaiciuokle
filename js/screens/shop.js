@@ -5,6 +5,7 @@ import { CATEGORIES, itemsIn, isOwned, friendGrants } from '../catalog.js';
 import { monsterSVG, COLORS, WEAR, randomParts } from '../monster.js';
 import { spendStars, addFriend } from '../rewards.js';
 import { monsterView } from '../monsterView.js';
+import { roomState, currentRoomId, ROOM_BY_ID } from '../rooms.js';
 import { topBar, screen } from './common.js';
 
 export function render(ctx, { tab: initialTab } = {}) {
@@ -42,10 +43,13 @@ export function render(ctx, { tab: initialTab } = {}) {
     return h('div.item-preview.emoji' + (big ? '.big' : ''), null, item.emoji);
   }
 
+  // Baldai, sienos ir grindys keliauja į paskutinį aplankytą kambarį.
+  const curRoom = () => roomState(s, currentRoomId(s));
+
   function isActive(item) {
     if (item.cat === 'clothes') return s.monster.wear && s.monster.wear[WEAR[item.id].slot] === item.id;
     if (item.cat === 'parts') return s.monster.parts[item.part] === item.opt;
-    if (item.cat === 'decor') return s.room[item.slot === 'wall' ? 'wallpaper' : 'floor'] === item.id;
+    if (item.cat === 'decor') return curRoom()[item.slot === 'wall' ? 'wallpaper' : 'floor'] === item.id;
     return false;
   }
 
@@ -57,7 +61,7 @@ export function render(ctx, { tab: initialTab } = {}) {
     } else if (item.cat === 'parts') {
       s.monster.parts[item.part] = item.opt;
     } else if (item.cat === 'decor') {
-      s.room[item.slot === 'wall' ? 'wallpaper' : 'floor'] = item.id;
+      curRoom()[item.slot === 'wall' ? 'wallpaper' : 'floor'] = item.id;
     }
     ctx.save();
     mv.refresh();
@@ -91,8 +95,10 @@ export function render(ctx, { tab: initialTab } = {}) {
     } else {
       s.owned.push(item.id);
       s.counters.purchases += 1;
+      for (const g of item.grants || []) if (!s.owned.includes(g)) s.owned.push(g);
+      if (item.cat === 'rooms') roomState(s, item.room);
       if (item.cat === 'furniture') {
-        s.room.items.push({ uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), id: item.id, x: 15 + Math.random() * 70, y: item.kind === 'emoji' ? 55 + Math.random() * 35 : 80 });
+        curRoom().items.push({ uid: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), id: item.id, x: 15 + Math.random() * 70, y: item.kind === 'emoji' ? 55 + Math.random() * 35 : 80 });
       }
     }
     ctx.updateStarCounters();
@@ -122,6 +128,7 @@ export function render(ctx, { tab: initialTab } = {}) {
           close();
           confetti(30);
           if (item.consumable) feed(item);
+          else if (item.cat === 'rooms') { ctx.go('room', { room: item.room, fresh: true }); return; }
           else if (item.cat !== 'furniture') use(item);
           else mv.say('Jau kambaryje!');
           draw();
@@ -130,6 +137,8 @@ export function render(ctx, { tab: initialTab } = {}) {
       if (missing > 0) actions.push(h('div.sheet-missing', null, `Dar trūksta ${missing} ⭐`));
     } else if (item.cat === 'friends') {
       actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('friends'); } }, 'Pas draugus 👫'));
+    } else if (item.cat === 'rooms') {
+      actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('room', { room: item.room }); } }, 'Eiti ten 🏡'));
     } else if (item.cat === 'furniture') {
       actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('room'); } }, 'Į kambarį 🏠'));
     } else {
@@ -145,6 +154,8 @@ export function render(ctx, { tab: initialTab } = {}) {
       preview(item, true),
       h('div.sheet-name', null, item.name),
       item.group ? h('div.sheet-group', null, item.group) : null,
+      item.cat === 'rooms' ? h('div.sheet-group', null, 'Naujas kambarys tavo name. Ten gali gyventi draugai ir stovėti baldai.') : null,
+      item.cat === 'furniture' || item.cat === 'decor' ? h('div.sheet-group', null, `Keliaus į: ${ROOM_BY_ID[currentRoomId(s)].icon} ${ROOM_BY_ID[currentRoomId(s)].name}`) : null,
       item.cat === 'friends' ? h('div.sheet-group', null, item.repeat ? 'Susikurk dar vieną padarėlį! Jis augs atskirai.' : 'Iš kiaušinio išsiris naujas draugas. Jis augs atskirai.') : null,
       h('div.sheet-actions', null, actions)), { className: 'modal-sheet' });
   }

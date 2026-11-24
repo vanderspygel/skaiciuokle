@@ -1,11 +1,13 @@
 // Parduotuvės prekės. Kainų kreivė: pirmi daiktai pigūs, įspūdingiausi – brangūs.
 
 import { PARTS, PART_ORDER, partItemId } from './monster.js';
+import { ROOMS, roomItemId } from './rooms.js';
 
 export const CATEGORIES = [
   { id: 'friends', title: 'Draugai', icon: '🥚' },
   { id: 'clothes', title: 'Rūbai', icon: '🎩' },
   { id: 'parts', title: 'Kūnas', icon: '🎨' },
+  { id: 'rooms', title: 'Kambariai', icon: '🏡' },
   { id: 'furniture', title: 'Baldai', icon: '🛋️' },
   { id: 'decor', title: 'Sienos', icon: '🖼️' },
   { id: 'treats', title: 'Skanėstai', icon: '🍪' },
@@ -100,6 +102,28 @@ const FURNITURE = [
   ['f-fountain', 'Fontanas', 90, '⛲', null, 1.5],
   ['f-ferris', 'Apžvalgos ratas', 140, '🎡', null, 1.8],
   ['f-circus', 'Cirkas', 180, '🎪', null, 1.8],
+  // Tinka konkretiems kambariams (bet galima statyti bet kur).
+  ['f-pillow', 'Pagalvė', 8, '🛌'],
+  ['f-candle', 'Žvakė', 8, '🕯️'],
+  ['f-teapot', 'Arbatinukas', 10, '🫖'],
+  ['f-plates', 'Lėkštės', 12, '🍽️'],
+  ['f-pot', 'Puodas', 14, '🍲'],
+  ['f-soap', 'Muilas', 6, '🧼'],
+  ['f-duck', 'Guminė antytė', 9, '🐤'],
+  ['f-shower', 'Dušas', 30, '🚿', null, 1.3],
+  ['f-bathtub', 'Vonia', 45, '🛁', null, 1.6],
+  ['f-tree2', 'Medis', 30, '🌳', null, 1.8],
+  ['f-swing', 'Sūpynės', 25, '🪢', null, 1.3],
+  ['f-doghouse', 'Šuns būda', 35, '🏠', null, 1.4],
+  ['f-shield', 'Riterio skydas', 30, '🛡️'],
+  ['f-throne', 'Karališka karūna', 90, '👑', null, 1.2],
+  ['f-dragonegg', 'Drakono kiaušinis', 70, '🥚'],
+  ['f-shell', 'Kriauklė', 10, '🐚'],
+  ['f-octopus', 'Aštuonkojis', 40, '🐙', null, 1.2],
+  ['f-coral', 'Koralai', 25, '🪸', null, 1.2],
+  ['f-planet', 'Planeta', 60, '🪐', null, 1.4],
+  ['f-ufo', 'NSO', 120, '🛸', null, 1.5],
+  ['f-telescope', 'Teleskopas', 50, '🔭', null, 1.2],
 ].map(([id, name, price, emoji, kind, size]) => ({ id, cat: 'furniture', name, price, emoji, kind: kind || 'emoji', size: size || 1 }))
   .sort((a, b) => a.price - b.price);
 
@@ -121,6 +145,15 @@ const DECOR = [
   ['floor-checker', 'Šachmatų grindys', 25, 'floor'],
   ['floor-sand', 'Smėlis', 35, 'floor'],
   ['floor-gold', 'Auksinės grindys', 120, 'floor'],
+  ['wall-kitchen', 'Virtuvės plytelės', 30, 'wall'],
+  ['wall-bath', 'Vonios plytelės', 30, 'wall'],
+  ['floor-bath', 'Vonios grindys', 25, 'floor'],
+  ['wall-planks', 'Medinės lentos', 45, 'wall'],
+  ['wall-castle', 'Pilies akmenys', 80, 'wall'],
+  ['floor-stone', 'Akmeninės grindys', 60, 'floor'],
+  ['wall-sea', 'Po vandeniu', 90, 'wall'],
+  ['wall-space', 'Kosmosas', 100, 'wall'],
+  ['floor-metal', 'Kosminės grindys', 80, 'floor'],
 ].map(([id, name, price, slot]) => ({ id, cat: 'decor', name, price, slot }))
   .sort((a, b) => a.price - b.price);
 
@@ -183,7 +216,11 @@ export function friendKind(kind) {
   return FRIEND_KINDS.find(f => f.kind === kind) || FRIEND_KINDS[0];
 }
 
-export const ITEMS = [...FRIEND_KINDS, ...CLOTHES, ...PART_ITEMS, ...FURNITURE, ...DECOR, ...TREATS];
+// Kambariai: nupirkus gaunamos ir jų sienos bei grindys.
+const ROOM_ITEMS = ROOMS.filter(r => r.price > 0)
+  .map(r => ({ id: roomItemId(r.id), cat: 'rooms', name: r.name, price: r.price, emoji: r.icon, room: r.id, grants: [r.wallpaper, r.floor, ...(r.starter || [])] }));
+
+export const ITEMS = [...FRIEND_KINDS, ...ROOM_ITEMS, ...CLOTHES, ...PART_ITEMS, ...FURNITURE, ...DECOR, ...TREATS];
 
 export const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 

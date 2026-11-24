@@ -12,7 +12,8 @@ export function defaultState() {
     stars: 0,
     totalEarned: 0,
     owned: [],
-    room: { wallpaper: 'wall-cream', floor: 'floor-wood', items: [], monster: { x: 50, y: 72 } },
+    room: { wallpaper: 'wall-cream', floor: 'floor-wood', items: [], monster: { x: 50, y: 72 } }, // pirmasis kambarys
+    rooms: {}, // kiti kambariai: { kitchen: { wallpaper, floor, items } } (žr. rooms.js)
     progress: { unlocked: 1, levels: {} },
     stats: {},
     streak: 0,

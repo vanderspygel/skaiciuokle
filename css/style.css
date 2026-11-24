@@ -506,6 +506,15 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .floor-checker { background: conic-gradient(#2b2340 25%, #fff 0 50%, #2b2340 0 75%, #fff 0) 0 0 / 56px 56px; }
 .floor-sand { background: radial-gradient(circle, #e6c27a 1.5px, transparent 2.5px) 0 0 / 18px 18px, #f6dca0; }
 .floor-gold { background: repeating-linear-gradient(90deg, #ffd23f 0 60px, #f2b705 60px 64px), #ffd23f; }
+.wall-kitchen { background: linear-gradient(transparent 70%, #ffb3b3 70% 74%, transparent 74%), conic-gradient(#fff 25%, #e8f6ff 0 50%, #fff 0 75%, #e8f6ff 0) 0 0 / 40px 40px; }
+.wall-bath { background: repeating-linear-gradient(0deg, #ffffff 0 2px, transparent 2px 36px), repeating-linear-gradient(90deg, #ffffff 0 2px, transparent 2px 36px), #bfe7ff; }
+.floor-bath { background: conic-gradient(#5aa9ff 25%, #fff 0 50%, #5aa9ff 0 75%, #fff 0) 0 0 / 40px 40px; }
+.wall-planks { background: repeating-linear-gradient(0deg, #c98f55 0 34px, #a86b3a 34px 37px); }
+.wall-castle { background: linear-gradient(90deg, #8f8aa6 2px, transparent 2px) 0 0 / 70px 36px, linear-gradient(90deg, #8f8aa6 2px, transparent 2px) 35px 36px / 70px 36px, repeating-linear-gradient(0deg, #8f8aa6 0 2px, #b7b2cc 2px 36px); }
+.floor-stone { background: radial-gradient(ellipse 26px 14px, #9b96b0 96%, transparent) 0 0 / 60px 34px, radial-gradient(ellipse 26px 14px, #a7a2bc 96%, transparent) 30px 17px / 60px 34px, #7d7894; }
+.wall-sea { background: radial-gradient(circle, rgba(255, 255, 255, .55) 4px, transparent 5px) 10px 20px / 70px 90px, radial-gradient(circle, rgba(255, 255, 255, .4) 7px, transparent 8px) 40px 60px / 110px 120px, linear-gradient(#5ad0ff, #1f6fbf); }
+.wall-space { background: radial-gradient(circle, #fff 1.5px, transparent 2.5px) 0 0 / 40px 40px, radial-gradient(circle, #ffd23f 2px, transparent 3px) 20px 25px / 90px 90px, radial-gradient(circle at 80% 30%, #ff9f45 30px, transparent 32px), linear-gradient(#0c0a2a, #2a1f6a); }
+.floor-metal { background: radial-gradient(circle, #9aa6c0 3px, transparent 4px) 0 0 / 50px 50px, repeating-linear-gradient(90deg, #c9d3e6 0 80px, #aeb9d0 80px 83px); }
 .floor-wood { background: repeating-linear-gradient(90deg, #dba56c 0 70px, #c98f55 70px 73px); }
 .floor-grass { background: repeating-linear-gradient(90deg, #8fd16a 0 18px, #82c75c 18px 36px); }
 .floor-tiles { background: conic-gradient(#fff 25%, #ffd6e0 0 50%, #fff 0 75%, #ffd6e0 0) 0 0 / 64px 64px; }
@@ -615,3 +624,11 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .stage-steps { display: flex; gap: 0; justify-content: center; font-size: .9rem; margin-top: 2px; }
 .stage-steps span { opacity: .3; filter: grayscale(1); }
 .stage-steps span.done { opacity: 1; filter: none; }
+
+/* ---------- Kambarių mygtukai ---------- */
+.room-tabs { display: flex; gap: 8px; padding-bottom: 10px; overflow-x: auto; flex-shrink: 0; }
+.room-tab { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px; font-size: 17px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+.room-tab-icon { font-size: 24px; }
+.room-tab.active { background: #fff3d6; border-color: #ffb547; }
+.room-tab.drop-hover { background: #d4f5c4; border-color: #4fa82f; transform: scale(1.1); }
+.room-tab-add { border-style: dashed; }

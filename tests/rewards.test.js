@@ -139,3 +139,19 @@ test('daugiau augimo etapų po „Didelis“', () => {
   addStars(s, 5000);
   assert.equal(friendStage(s.monster, s).id, 'legend');
 });
+
+test('kambariai: pirmasis visada yra, kiti sukuriami nupirkus', async () => {
+  const { hasRoom, roomState, currentRoomId, ownedRooms } = await import('../js/rooms.js');
+  const s = migrate({ schemaVersion: 1, room: { wallpaper: 'wall-dots', floor: 'floor-wood', items: [{ id: 'f-ball', x: 1, y: 2 }] }, prefs: {} });
+  assert.deepEqual(s.rooms, {});
+  assert.equal(currentRoomId(s), 'home');
+  assert.equal(roomState(s, 'home').wallpaper, 'wall-dots');
+  assert.ok(!hasRoom(s, 'kitchen'));
+  s.prefs.room = 'kitchen';
+  assert.equal(currentRoomId(s), 'home');
+  s.owned.push('room:kitchen');
+  assert.equal(currentRoomId(s), 'kitchen');
+  assert.equal(roomState(s, 'kitchen').wallpaper, 'wall-kitchen');
+  assert.deepEqual(roomState(s, 'kitchen').items.map(i => i.id), ['f-teapot', 'f-plates']);
+  assert.equal(ownedRooms(s).length, 2);
+});
