@@ -23,7 +23,7 @@ export function defaultState() {
     days: { last: null, streak: 0, best: 0, total: 0 },
     tests: [],
     badges: {},
-    prefs: { lastSpeed: 'turtle', lastTestCount: 10, lastInput: 'pad', game: 10 },
+    prefs: { lastSpeed: 'fox', lastTestCount: 10, lastInput: 'pad', game: 10 },
   };
 }
 
