@@ -36,13 +36,20 @@ export const STREAK_BONUS_EVERY = 5;
 export const STREAK_BONUS = 2;
 export const FAST_BONUS = 1;
 
-// Padarėlio augimas pagal VISAS kada nors uždirbtas žvaigždutes.
-// ~40–50 ⭐ per dieną → paskutinis etapas per ~2–3 savaites.
+// Draugo augimas pagal žvaigždutes, uždirbtas kol žaidė būtent su juo (monster.grow).
+// ~40–50 ⭐ per dieną → „Didelis“ per ~2–3 savaites, „Legenda“ per ~3–4 mėnesius.
+// Etapų id 'egg', 'baby', 'teen', 'big' ir jų ribos palikti kaip anksčiau.
+// fx: papildomas papuošimas po padarėliu ar aplink jį (žr. monster.js stageFx).
 export const STAGES = [
-  { id: 'egg', name: 'Kiaušinis', min: 0, scale: 0.55 },
-  { id: 'baby', name: 'Mažylis', min: 15, scale: 0.7 },
-  { id: 'teen', name: 'Paauglys', min: 250, scale: 0.85 },
-  { id: 'big', name: 'Didelis', min: 700, scale: 1 },
+  { id: 'egg', name: 'Kiaušinis', emoji: '🥚', min: 0, scale: 0.55 },
+  { id: 'baby', name: 'Mažylis', emoji: '🐣', min: 15, scale: 0.66 },
+  { id: 'kid', name: 'Vaikas', emoji: '🌱', min: 100, scale: 0.76 },
+  { id: 'teen', name: 'Paauglys', emoji: '🌿', min: 250, scale: 0.86 },
+  { id: 'big', name: 'Didelis', emoji: '🌳', min: 700, scale: 0.95 },
+  { id: 'strong', name: 'Stipruolis', emoji: '💪', min: 1200, scale: 1, fx: 'glow' },
+  { id: 'super', name: 'Superžvaigždė', emoji: '⭐', min: 2000, scale: 1, fx: 'sparkle' },
+  { id: 'magic', name: 'Stebuklingas', emoji: '🌈', min: 3000, scale: 1, fx: 'rainbow' },
+  { id: 'legend', name: 'Legenda', emoji: '👑', min: 4500, scale: 1, fx: 'legend' },
 ];
 
 // Kontrolinio rezultatas → žvaigždutės ir reakcija.
