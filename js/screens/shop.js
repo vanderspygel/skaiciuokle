@@ -136,6 +136,7 @@ export function render(ctx, { tab: initialTab } = {}) {
       actions.push(h('div.sheet-lock', null,
         h('div.sheet-lock-title', null, '🔒 Dar užrakinta'),
         lock.stage ? h('div', null, `Užaugink draugą iki: ${lock.stage.emoji} ${lock.stage.name}`) : null,
+        ...(lock.gates || []).map(g => h('div', null, `Kad draugas augtų: ${g.text}`)),
         lock.skill ? h('div', null, `Įveik: ${lock.skill.text}`) : null,
         h('div.small', null, `Kaina: ${priceText}`)));
     } else if (!owned) {
