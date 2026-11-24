@@ -125,6 +125,16 @@ test('svajonių prekės: kaina + deimantai + įgūdis', () => {
   assert.ok(itemLock(s, crown, maxStage(s)).ok);
 });
 
+test('užrakinta prekė parodo ir trūkstamą augimo įgūdį', () => {
+  const s = defaultState();
+  s.monster = { uid: 'a', kind: 'monster', parts: {}, wear: {}, grow: 2500, reached: 0 };
+  const crown = ITEM_BY_ID['hat-crown'];
+  const lock = itemLock(s, crown, maxStage(s));
+  // Augimo užtenka, bet „Stipruoliui“ ir „Superžvaigždei“ trūksta įgūdžių.
+  assert.equal(lock.stage.id, 'super');
+  assert.deepEqual(lock.gates.map(g => g.text), ['Atrakink visus lygius iki 10', 'Kontrolinis be klaidų 🐎 Žirgu ar greičiau']);
+});
+
 test('parduotuvės pakopos atsidaro su augimu', () => {
   assert.equal(requiredStage(ITEM_BY_ID['f-balloons']), 'egg');
   assert.equal(requiredStage(ITEM_BY_ID['room:kitchen']), 'kid');

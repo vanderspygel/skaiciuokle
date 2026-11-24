@@ -82,7 +82,8 @@ export function render(ctx, params) {
       walker);
   }
 
-  const gameTag = game.id === 10 ? '' : ` · iki ${game.id}`;
+  // „· iki 20“ – jei lygio pavadinime to dar nėra.
+  const gameTag = game.id === 10 || (level && /iki 20/i.test(level.title)) ? '' : ` · iki ${game.id}`;
   const title = (level ? `${level.id}. ${level.title}` : isTest ? 'Kontrolinis' : mode === 'review' ? 'Taisom klaidas' : isWrite ? '✍️ Rašyti' : `${speed.emoji} ${speed.name}${useDraw ? ' ✍️' : ''}`) + gameTag;
   const el = screen('quiz' + (isTest ? '.is-test' : ''),
     topBar(ctx, { back: mode === 'practice' ? 'levels' : 'home', title, extra: dots }),
@@ -111,6 +112,8 @@ export function render(ctx, params) {
   const mult = mode === 'review' ? 1 : modeMult(mode, speed && speed.id);
   const pKey = level ? practiceKey(game.id, level.id) : null;
   const repeat = pKey ? repeatMult(today(s, dateKey()).rounds[pKey] || 0) : 1;
+  // Naujausias lygis raundo pradžioje: jei šis raundas atrakins kitą, užduotis vis tiek įskaitoma.
+  const topAtStart = level ? gameProgress(s, game).unlocked : null;
   let reviewAllRight = true;
   const log = [];
   const timers = new Set();
@@ -542,7 +545,7 @@ export function render(ctx, params) {
     if (gems) ctx.addGems(gems);
     ctx.quest({
       type: 'round', mode, speed: speed && speed.id, game: game.id, ok: firstOk, total,
-      level: level && level.id, topLevel: level && gameProgress(s, game).unlocked,
+      level: level && level.id, topLevel: topAtStart,
     });
     const why = [];
     if (speed) why.push(`${speed.emoji} ×${String(mult).replace('.', ',')}`);

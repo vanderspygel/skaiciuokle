@@ -188,7 +188,13 @@ export function stageNumber(id) {
 export function itemLock(state, item, maxStageIdx) {
   const need = stageNumber(requiredStage(item));
   const lock = {};
-  if (maxStageIdx < need) lock.stage = STAGES[need];
+  if (maxStageIdx < need) {
+    lock.stage = STAGES[need];
+    // Etapams iki reikiamo gali trūkti ir įgūdžio, ne tik augimo – parodom, kurio.
+    lock.gates = STAGES.slice(maxStageIdx + 1, need + 1)
+      .filter(st => st.gate && !hasSkill(state, st.gate) && st.gate !== item.skill)
+      .map(st => SKILLS[st.gate]);
+  }
   if (item.skill && !hasSkill(state, item.skill)) lock.skill = SKILLS[item.skill];
   lock.ok = !lock.stage && !lock.skill;
   return lock;
