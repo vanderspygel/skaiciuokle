@@ -1,6 +1,6 @@
-import { h } from '../ui.js';
-import { monsterView } from '../monsterView.js';
-import { stageFor, dateKey } from '../rewards.js';
+import { h, svgEl } from '../ui.js';
+import { monsterView, friendSVG } from '../monsterView.js';
+import { friendStage, growOf, switchFriend, dateKey } from '../rewards.js';
 import { STAGES, GAMES, gameFor } from '../config.js';
 import { screen } from './common.js';
 
@@ -8,20 +8,19 @@ const HELLO = ['Labas!', 'Sveika!', 'Pažaidžiam?', 'Skaičiuojam?'];
 
 export function render(ctx) {
   const s = ctx.state;
-  const st = stageFor(s.totalEarned);
+  const st = friendStage(s.monster, s);
   const mv = monsterView(ctx, { className: 'home-monster' });
-
-  // Kiek liko iki kito etapo.
+  const growth = growthBar(s.monster, s);
   const idx = STAGES.indexOf(st);
-  const nextStage = STAGES[idx + 1];
-  let growth = null;
-  if (nextStage) {
-    const pct = Math.min(100, Math.round((s.totalEarned - st.min) / (nextStage.min - st.min) * 100));
-    growth = h('div.growth', { title: 'Augimas' },
-      h('span', null, st.id === 'egg' ? '🥚' : '🌱'),
-      h('div.growth-bar', null, h('div.growth-fill', { style: { width: pct + '%' } })),
-      h('span', null, st.id === 'egg' ? '🐣' : '🌳'));
-  }
+
+  // Kiti draugai – mažyčiai; bakstelėjus žaidžiama su juo.
+  const others = (s.friends || []).slice(0, 4);
+  const friendsRow = others.length
+    ? h('div.home-friends', null, others.map(f => h('button.btn.home-friend', {
+      'aria-label': f.name,
+      onclick: () => { switchFriend(s, f.uid); ctx.save(); ctx.go('home'); },
+    }, svgEl(friendSVG(ctx, f)))))
+    : null;
 
   const big = (icon, label, cls, onclick) =>
     h('button.btn.btn-mode.' + cls, { onclick }, h('span.btn-mode-icon', null, icon), h('span', null, label));
@@ -50,8 +49,9 @@ export function render(ctx) {
     h('section.home-stage', null,
       mv.el,
       h('div.home-name', null, s.monster.name),
-      h('div.home-sub', null, st.name),
-      growth),
+      h('div.home-sub', null, `${st.name} · ${idx + 1} iš ${STAGES.length}`),
+      growth,
+      friendsRow),
     h('div.game-switch', { role: 'group', 'aria-label': 'Žaidimas' }, gameBtns),
     h('nav.home-modes', null,
       big('🔢', 'Skaičiuoti', 'mode-practice', () => ctx.go('levels')),
@@ -61,6 +61,7 @@ export function render(ctx) {
     h('nav.home-more', null,
       small('🛍️', 'Parduotuvė', () => ctx.go('shop')),
       small('🏠', 'Kambarys', () => ctx.go('room')),
+      small('👫', 'Draugai', () => ctx.go('friends')),
       small('🏅', 'Ženkliukai', () => ctx.go('badges'))));
 
   // Pasisveikinimas. Jei ilgai nežaidė – tiesiog džiaugiasi.
@@ -73,4 +74,16 @@ export function render(ctx) {
   const t2 = setTimeout(() => ctx.showCelebrations(() => mv.refresh()), 300);
 
   return { el, destroy() { clearTimeout(t1); clearTimeout(t2); } };
+}
+
+// Augimo juosta iki kito etapo (null, jei jau paskutinis).
+export function growthBar(m, s) {
+  const st = friendStage(m, s);
+  const next = STAGES[STAGES.indexOf(st) + 1];
+  if (!next) return h('div.growth', null, h('span', null, '👑 Legenda!'));
+  const pct = Math.min(100, Math.round((growOf(m, s) - st.min) / (next.min - st.min) * 100));
+  return h('div.growth', { title: `Iki etapo „${next.name}“` },
+    h('span', null, st.emoji),
+    h('div.growth-bar', null, h('div.growth-fill', { style: { width: pct + '%' } })),
+    h('span', null, next.emoji));
 }

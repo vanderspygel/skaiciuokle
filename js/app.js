@@ -1,7 +1,7 @@
 // Programos pradžia: būsena, ekranų perjungimas, apdovanojimai.
 
 import { load, save, requestPersist } from './storage.js';
-import { addStars, checkAchievements, markPlayed, dateKey, stageIndex, stageFor } from './rewards.js';
+import { addStars, checkAchievements, markPlayed, dateKey, friendStage } from './rewards.js';
 import { h, toast, confetti, modal } from './ui.js';
 import { monsterView } from './monsterView.js';
 
@@ -15,8 +15,9 @@ import * as shop from './screens/shop.js';
 import * as room from './screens/room.js';
 import * as badges from './screens/badges.js';
 import * as teach from './screens/teach.js';
+import * as friends from './screens/friends.js';
 
-const SCREENS = { home, create, levels, quiz, setup, results, shop, room, badges, teach };
+const SCREENS = { home, create, levels, quiz, setup, results, shop, room, badges, teach, friends };
 
 const root = document.getElementById('app');
 let current = null;
@@ -51,7 +52,7 @@ const ctx = {
 
   // Kviesti po bet kokio skaitiklio pakeitimo.
   checkBadges() {
-    const before = this.state.totalEarned;
+    const before = friendStage(this.state.monster, this.state);
     const earned = checkAchievements(this.state);
     for (const a of earned) {
       toast(h('div.badge-toast', null,
@@ -61,9 +62,8 @@ const ctx = {
     }
     if (earned.length) {
       // Pasiekimų premija gali užauginti padarėlį.
-      if (stageIndex(this.state.totalEarned) > stageIndex(before)) {
-        this.pendingStages.push(stageFor(this.state.totalEarned));
-      }
+      const after = friendStage(this.state.monster, this.state);
+      if (after.min > before.min) this.pendingStages.push(after);
       this.updateStarCounters();
       this.save();
     }
@@ -84,7 +84,7 @@ const ctx = {
     if (!stage) { done && done(); return; }
     const mv = monsterView(this, { className: 'celebrate-monster', interactive: false });
     const name = this.state.monster.name;
-    const text = stage.id === 'baby' ? `${name} išsirito!` : `${name} paaugo!`;
+    const text = stage.id === 'baby' ? `${name} išsirito!` : stage.fx ? `${name} tapo dar šaunesnis!` : `${name} paaugo!`;
     let close;
     const content = h('div.celebrate', null,
       h('div.celebrate-title', null, 'Valio!'),
