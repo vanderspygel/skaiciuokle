@@ -1,7 +1,7 @@
 // Service worker: visi failai kešuojami (cache-first), žaidimas veikia be interneto.
 // SVARBU: po kiekvieno pakeitimo padidink VERSION, kitaip iPad'as neatsinaujins.
 
-const VERSION = 'v15';
+const VERSION = 'v16';
 const CACHE = `skaiciuokle-${VERSION}`;
 
 const ASSETS = [
@@ -34,6 +34,7 @@ const ASSETS = [
   './js/screens/badges.js',
   './js/screens/parent.js',
   './js/parent.js',
+  './js/economy.js',
   './js/screens/friends.js',
   './icons/icon.svg',
   './icons/icon-180.png',

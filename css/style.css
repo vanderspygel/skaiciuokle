@@ -681,3 +681,27 @@ h2 { font-size: 26px; margin: 18px 0 10px; }
 .room-tab.active { background: #fff3d6; border-color: #ffb547; }
 .room-tab.drop-hover { background: #d4f5c4; border-color: #4fa82f; transform: scale(1.1); }
 .room-tab-add { border-style: dashed; }
+
+/* ---------- Žvaigždučių ekonomika: deimantai, dienos užduotis, užraktai ---------- */
+.gem-count { color: #3a7bd5; }
+.overlay-why { font-size: 20px; font-weight: 700; color: var(--muted); }
+.overlay-hint { font-size: 18px; color: var(--muted); max-width: 420px; text-align: center; }
+.growth-wrap { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.growth-gate { font-size: 16px; color: var(--muted); text-align: center; margin-top: 2px; }
+.quest-card {
+  display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 14px;
+  background: #fff8e1; border: 2px solid #ffe08a; border-radius: 18px; max-width: 520px; width: 100%;
+}
+.quest-card.done { background: #effaf2; border-color: #bfe8cf; }
+.quest-icon { font-size: 28px; }
+.quest-body { flex: 1; text-align: left; }
+.quest-title { font-size: 14px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+.quest-text { font-size: 18px; font-weight: 700; }
+.quest-prize { font-size: 16px; font-weight: 800; color: #c98a00; white-space: nowrap; }
+.shop-card { position: relative; }
+.shop-card.locked { opacity: .55; filter: grayscale(.6); }
+.shop-card.dream { border-color: #c7b6ff; background: linear-gradient(180deg, #fbf8ff, #fff); }
+.shop-lock { position: absolute; top: 6px; right: 8px; font-size: 22px; }
+.sheet-lock { text-align: center; font-size: 20px; display: flex; flex-direction: column; gap: 6px; }
+.sheet-lock-title { font-size: 24px; font-weight: 900; }
+.parent-skills { margin: 4px 0 0; padding-left: 4px; list-style: none; columns: 2; font-size: 16px; }

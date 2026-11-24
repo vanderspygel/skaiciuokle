@@ -2,6 +2,7 @@
 
 import { PARTS, PART_ORDER, partItemId } from './monster.js';
 import { ROOMS, roomItemId } from './rooms.js';
+import { DREAM } from './economy.js';
 
 export const CATEGORIES = [
   { id: 'friends', title: 'Draugai', icon: '🥚' },
@@ -221,6 +222,12 @@ const ROOM_ITEMS = ROOMS.filter(r => r.price > 0)
   .map(r => ({ id: roomItemId(r.id), cat: 'rooms', name: r.name, price: r.price, emoji: r.icon, room: r.id, grants: [r.wallpaper, r.floor, ...(r.starter || [])] }));
 
 export const ITEMS = [...FRIEND_KINDS, ...ROOM_ITEMS, ...CLOTHES, ...PART_ITEMS, ...FURNITURE, ...DECOR, ...TREATS];
+
+// Svajonių prekės: kaina žvaigždutėmis + deimantai + įgūdis (economy.js DREAM).
+for (const item of ITEMS) {
+  const d = DREAM[item.id];
+  if (d) Object.assign(item, d, { dream: true });
+}
 
 export const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 

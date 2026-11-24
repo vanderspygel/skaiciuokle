@@ -44,12 +44,12 @@ export const UNLOCK_CORRECT = 15;
 export const UNLOCK_WINDOW = 20;
 export const UNLOCK_ACCURACY = 0.8;
 
-// Laiko lygiai (sekundės vienam veiksmui).
+// Laiko lygiai (sekundės vienam veiksmui). mult – žvaigždučių daugiklis (greičiau – daugiau).
 export const SPEEDS = [
-  { id: 'fox', name: 'Lapė', emoji: '🦊', seconds: 20, stars: 3 },
-  { id: 'horse', name: 'Žirgas', emoji: '🐎', seconds: 15, stars: 3 },
-  { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 10, stars: 3 },
-  { id: 'falcon', name: 'Sakalas', emoji: '🦅', seconds: 7, stars: 3 },
+  { id: 'fox', name: 'Lapė', emoji: '🦊', seconds: 20, mult: 1 },
+  { id: 'horse', name: 'Žirgas', emoji: '🐎', seconds: 15, mult: 1.5 },
+  { id: 'cheetah', name: 'Gepardas', emoji: '🐆', seconds: 10, mult: 2 },
+  { id: 'falcon', name: 'Sakalas', emoji: '🦅', seconds: 7, mult: 2.5 },
 ];
 
 // Greičio ženkliukas istorijai (taip pat ir pašalintiems senesniems greičiams).
@@ -58,15 +58,11 @@ export function speedEmoji(id) {
   return sp ? sp.emoji : { turtle: '🐢', rabbit: '🐇' }[id] || '';
 }
 
-// Rašymo režime už teisingą atsakymą (rašyti sunkiau nei bakstelėti).
-export const WRITE_STARS = 2;
-
-export const STREAK_BONUS_EVERY = 5;
-export const STREAK_BONUS = 2;
-export const FAST_BONUS = 1;
+// Kiek žvaigždučių moka užduotys – žr. economy.js.
 
 // Draugo augimas pagal žvaigždutes, uždirbtas kol žaidė būtent su juo (monster.grow).
-// ~40–50 ⭐ per dieną → „Didelis“ per ~2–3 savaites, „Legenda“ per ~3–4 mėnesius.
+// ~250 ⭐ per įprastą dieną (10–15 min). gate – keturiems aukščiausiems etapams dar reikia
+// įgūdžio (žr. SKILLS economy.js); jau pasiekto etapo niekada neatimam.
 // Etapų id 'egg', 'baby', 'teen', 'big' ir jų ribos palikti kaip anksčiau.
 // fx: papildomas papuošimas po padarėliu ar aplink jį (žr. monster.js stageFx).
 export const STAGES = [
@@ -75,10 +71,10 @@ export const STAGES = [
   { id: 'kid', name: 'Vaikas', emoji: '🌱', min: 100, scale: 0.76 },
   { id: 'teen', name: 'Paauglys', emoji: '🌿', min: 250, scale: 0.86 },
   { id: 'big', name: 'Didelis', emoji: '🌳', min: 700, scale: 0.95 },
-  { id: 'strong', name: 'Stipruolis', emoji: '💪', min: 1200, scale: 1, fx: 'glow' },
-  { id: 'super', name: 'Superžvaigždė', emoji: '⭐', min: 2000, scale: 1, fx: 'sparkle' },
-  { id: 'magic', name: 'Stebuklingas', emoji: '🌈', min: 3000, scale: 1, fx: 'rainbow' },
-  { id: 'legend', name: 'Legenda', emoji: '👑', min: 4500, scale: 1, fx: 'legend' },
+  { id: 'strong', name: 'Stipruolis', emoji: '💪', min: 1200, scale: 1, fx: 'glow', gate: 'levels10' },
+  { id: 'super', name: 'Superžvaigždė', emoji: '⭐', min: 2000, scale: 1, fx: 'sparkle', gate: 'testHorse' },
+  { id: 'magic', name: 'Stebuklingas', emoji: '🌈', min: 3000, scale: 1, fx: 'rainbow', gate: 'level20_2' },
+  { id: 'legend', name: 'Legenda', emoji: '👑', min: 4500, scale: 1, fx: 'legend', gate: 'round9Cheetah20' },
 ];
 
 // Kontrolinio rezultatas → žvaigždutės ir reakcija.
@@ -87,9 +83,4 @@ export function testRating(ratio) {
   if (ratio >= 0.8) return { stars: 2, emoji: '😊', text: 'Labai gerai!' };
   if (ratio >= 0.5) return { stars: 1, emoji: '🙂', text: 'Gerai!' };
   return { stars: 0, emoji: '🤗', text: 'Treniruojamės toliau! 💪' };
-}
-
-// Kontrolinio premija: 3 ⭐ rezultatas su 20 užduočių = 30 ⭐.
-export function testBonus(ratingStars, count) {
-  return Math.round(ratingStars * count / 2);
 }

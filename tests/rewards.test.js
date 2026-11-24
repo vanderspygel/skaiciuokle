@@ -5,7 +5,7 @@ import {
   checkAchievements, unlockedKinds, addFriend, switchFriend, friendStage, allFriends,
 } from '../js/rewards.js';
 import { migrate, defaultState, SCHEMA_VERSION } from '../js/storage.js';
-import { testRating, testBonus } from '../js/config.js';
+import { testRating } from '../js/config.js';
 
 test('išleidimas neatima augimo', () => {
   const s = defaultState();
@@ -24,11 +24,11 @@ test('addStars praneša apie naują etapą', () => {
   assert.equal(addStars(s, 1000).id, 'big');
 });
 
-test('serijos premija kas 5 teisingus', () => {
+test('serijos premija auga: 5 iš eilės +1, 10 +2', () => {
   const s = defaultState();
   const bonuses = [];
   for (let i = 0; i < 10; i++) bonuses.push(updateStreak(s, true));
-  assert.deepEqual(bonuses, [0, 0, 0, 0, 2, 0, 0, 0, 0, 2]);
+  assert.deepEqual(bonuses, [0, 0, 0, 0, 1, 0, 0, 0, 0, 2]);
   updateStreak(s, false);
   assert.equal(s.streak, 0);
   assert.equal(s.counters.bestStreak, 10);
@@ -81,13 +81,11 @@ test('pasiekimai suteikiami vieną kartą su premija', () => {
   assert.equal(checkAchievements(s, 2).length, 0);
 });
 
-test('kontrolinio įvertinimas ir premija', () => {
+test('kontrolinio įvertinimas', () => {
   assert.equal(testRating(1).stars, 3);
   assert.equal(testRating(0.85).stars, 2);
   assert.equal(testRating(0.5).stars, 1);
   assert.equal(testRating(0.3).stars, 0);
-  assert.equal(testBonus(3, 20), 30);
-  assert.equal(testBonus(3, 10), 15);
 });
 
 test('migracija užpildo trūkstamus laukus', () => {
@@ -159,9 +157,15 @@ test('daugiau augimo etapų po „Didelis“', () => {
   addFriend(s, { name: 'A', parts: {}, wear: {} });
   addStars(s, 700);
   assert.equal(friendStage(s.monster, s).id, 'big');
-  assert.equal(addStars(s, 500).id, 'strong');
+  // Aukščiausiems etapams reikia ir įgūdžių (economy.js).
+  assert.equal(addStars(s, 500), null);
+  s.progress.unlocked = 6;
+  assert.equal(addStars(s, 1).id, 'strong');
   addStars(s, 5000);
-  assert.equal(friendStage(s.monster, s).id, 'legend');
+  assert.equal(friendStage(s.monster, s).id, 'strong');
+  s.records = { 't:10:horse': 1, 'm:20:cheetah': 1 };
+  s.progress20.unlocked = 2;
+  assert.equal(addStars(s, 1).id, 'legend');
 });
 
 test('kambariai: pirmasis visada yra, kiti sukuriami nupirkus', async () => {

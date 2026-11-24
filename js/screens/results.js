@@ -1,17 +1,21 @@
 // Kontrolinio rezultatai: žvaigždutės, reakcija, klaidų sąrašas.
 
 import { h, confetti } from '../ui.js';
-import { testRating, testBonus, gameFor } from '../config.js';
+import { testRating, gameFor, SPEEDS } from '../config.js';
+import { roundStars, roundGems, speedMult, recordBest } from '../economy.js';
 import { problemText, answerText } from '../math.js';
 import { dateKey } from '../rewards.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
 
-export function render(ctx, { log, speed, count, input }) {
+export function render(ctx, { log, speed, count, input, points = 0 }) {
   const s = ctx.state;
   const ok = log.filter(x => x.correct).length;
   const rating = testRating(ok / count);
-  const bonus = testBonus(rating.stars, count);
+  const mult = speedMult(speed);
+  const bonus = roundStars({ points, mult, ok, total: count });
+  const gems = roundGems({ mode: 'test', speed, ok, total: count });
+  const sp = SPEEDS.find(x => x.id === speed);
   const mistakes = log.filter(x => !x.correct);
 
   s.tests.push({ date: dateKey(), n: count, speed, ok, rating: rating.stars, game: gameFor(s).id });
@@ -21,7 +25,11 @@ export function render(ctx, { log, speed, count, input }) {
     s.counters.perfectTests += 1;
     if (speed === 'cheetah') s.counters.perfectCheetah += 1;
   }
+  // Įgūdis įrašomas prieš apdovanojimą, kad draugas galėtų iškart paaugti.
+  recordBest(s, 't', gameFor(s).id, speed, ok, count);
   ctx.reward(bonus);
+  if (gems) ctx.addGems(gems);
+  ctx.quest({ type: 'test', mode: 'test', speed, game: gameFor(s).id, ok, total: count });
 
   const mv = monsterView(ctx, { className: 'results-monster' });
   const starRow = h('div.result-stars', null,
@@ -48,7 +56,8 @@ export function render(ctx, { log, speed, count, input }) {
           starRow,
           h('div.result-score', null, `${ok} iš ${count}`),
           h('div.result-text', null, rating.text),
-          bonus ? h('div.result-bonus', null, `+${bonus} ⭐`) : null)),
+          h('div.result-bonus', null, `+${bonus} ⭐`, gems ? ` +${gems} 💎` : ''),
+          sp ? h('div.overlay-why', null, `${sp.emoji} ×${String(mult).replace('.', ',')}`) : null)),
       list,
       h('div.results-buttons', null,
         h('button.btn.btn-secondary.btn-big', { onclick: () => ctx.go('setup', { mode: 'test' }) }, 'Dar kartą 🔁'),

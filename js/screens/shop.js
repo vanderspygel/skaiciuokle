@@ -3,7 +3,8 @@
 import { h, svgEl, modal, confetti } from '../ui.js';
 import { CATEGORIES, itemsIn, isOwned, friendGrants } from '../catalog.js';
 import { monsterSVG, COLORS, WEAR, randomParts } from '../monster.js';
-import { spendStars, addFriend } from '../rewards.js';
+import { spendStars, addFriend, maxStage } from '../rewards.js';
+import { itemLock } from '../economy.js';
 import { monsterView } from '../monsterView.js';
 import { roomState, currentRoomId, ROOM_BY_ID } from '../rooms.js';
 import { topBar, screen } from './common.js';
@@ -69,8 +70,18 @@ export function render(ctx, { tab: initialTab } = {}) {
   }
 
   // Naujas draugas: kiaušinis su pasirinktos rūšies išvaizda; po to – vardas ir išvaizda.
+  // Ar užtenka žvaigždučių ir deimantų, ir ar prekė atrakinta.
+  const lockOf = item => itemLock(s, item, maxStage(s));
+  const canPay = item => s.stars >= item.price && (s.gems || 0) >= (item.gems || 0);
+  function pay(item) {
+    if (!lockOf(item).ok || !canPay(item)) return false;
+    spendStars(s, item.price);
+    if (item.gems) s.gems -= item.gems;
+    return true;
+  }
+
   function buyFriend(item) {
-    if (!spendStars(s, item.price)) return false;
+    if (!pay(item)) return false;
     if (!item.repeat) s.owned.push(item.id);
     for (const g of friendGrants(item)) if (!s.owned.includes(g)) s.owned.push(g);
     s.counters.purchases += 1;
@@ -89,7 +100,7 @@ export function render(ctx, { tab: initialTab } = {}) {
 
   function buy(item) {
     if (item.cat === 'friends') return buyFriend(item);
-    if (!spendStars(s, item.price)) return false;
+    if (!pay(item)) return false;
     if (item.consumable) {
       s.counters.fed += 1;
     } else {
@@ -115,13 +126,22 @@ export function render(ctx, { tab: initialTab } = {}) {
 
   function openItem(item) {
     const owned = isOwned(s, item) && !item.consumable;
-    const missing = item.price - s.stars;
+    const missing = Math.max(0, item.price - s.stars);
+    const missingGems = Math.max(0, (item.gems || 0) - (s.gems || 0));
+    const lock = lockOf(item);
+    const priceText = `${item.price} ⭐` + (item.gems ? ` + ${item.gems} 💎` : '');
     let close;
     const actions = [];
-    if (!owned) {
+    if (!owned && !lock.ok) {
+      actions.push(h('div.sheet-lock', null,
+        h('div.sheet-lock-title', null, '🔒 Dar užrakinta'),
+        lock.stage ? h('div', null, `Užaugink draugą iki: ${lock.stage.emoji} ${lock.stage.name}`) : null,
+        lock.skill ? h('div', null, `Įveik: ${lock.skill.text}`) : null,
+        h('div.small', null, `Kaina: ${priceText}`)));
+    } else if (!owned) {
       const verb = item.cat === 'friends' ? 'Gauti kiaušinį' : item.consumable ? 'Pavaišinti' : 'Pirkti';
       actions.push(h('button.btn.btn-primary.btn-big', {
-        disabled: missing > 0,
+        disabled: missing > 0 || missingGems > 0,
         onclick: () => {
           if (item.cat === 'friends') { close(); buy(item); return; }
           if (!buy(item)) return;
@@ -133,8 +153,11 @@ export function render(ctx, { tab: initialTab } = {}) {
           else mv.say('Jau kambaryje!');
           draw();
         },
-      }, `${verb} už ${item.price} ⭐`));
-      if (missing > 0) actions.push(h('div.sheet-missing', null, `Dar trūksta ${missing} ⭐`));
+      }, `${verb} už ${priceText}`));
+      if (missing > 0 || missingGems > 0) {
+        actions.push(h('div.sheet-missing', null, 'Dar trūksta ' + [missing ? `${missing} ⭐` : '', missingGems ? `${missingGems} 💎` : ''].filter(Boolean).join(' ir ')));
+      }
+      if (item.gems) actions.push(h('div.sheet-group', null, '💎 Deimantus gauni už sunkius raundus ir dienos užduotį.'));
     } else if (item.cat === 'friends') {
       actions.push(h('button.btn.btn-primary.btn-big', { onclick: () => { close(); ctx.go('friends'); } }, 'Pas draugus 👫'));
     } else if (item.cat === 'rooms') {
@@ -173,13 +196,15 @@ export function render(ctx, { tab: initialTab } = {}) {
     grid.textContent = '';
     for (const item of itemsIn(tab)) {
       const owned = isOwned(s, item) && !item.consumable;
-      const afford = s.stars >= item.price;
-      grid.append(h('button.btn.shop-card' + (owned ? '.owned' : '') + (!owned && !afford ? '.dim' : '') + (isActive(item) ? '.active' : ''), {
+      const locked = !owned && !lockOf(item).ok;
+      const afford = canPay(item);
+      grid.append(h('button.btn.shop-card' + (owned ? '.owned' : '') + (!owned && !afford ? '.dim' : '') + (locked ? '.locked' : '') + (item.dream ? '.dream' : '') + (isActive(item) ? '.active' : ''), {
         onclick: () => openItem(item),
       },
         preview(item),
+        locked ? h('span.shop-lock', null, '🔒') : null,
         h('div.shop-name', null, item.name),
-        h('div.shop-price', null, owned ? '✔' : `${item.price} ⭐`)));
+        h('div.shop-price', null, owned ? '✔' : `${item.price} ⭐` + (item.gems ? ` +${item.gems} 💎` : ''))));
     }
   }
 

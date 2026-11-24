@@ -6,11 +6,15 @@
 //  write    – atsakymas rašomas pirštu (be laiko).
 
 import { h, svgEl, pulse, confetti, toast } from '../ui.js';
-import { SPEEDS, FAST_BONUS, WRITE_STARS, gameFor } from '../config.js';
-import { Scheduler, makeChoices, checkAnswer, recordResult } from '../math.js';
+import { SPEEDS, gameFor } from '../config.js';
+import { Scheduler, makeChoices, checkAnswer, recordResult, statKey } from '../math.js';
+import {
+  problemPoints, masteryFactor, modeMult, roundStars, repeatMult, roundGems, ratingMult,
+  today, practiceKey, recordBest,
+} from '../economy.js';
 import { buildTemplates, recognizeNumber, addSample } from '../handwriting.js';
 import { drawPad } from '../drawpad.js';
-import { updateStreak, recordLevelAnswer, unlockedLevels, friendStage } from '../rewards.js';
+import { updateStreak, recordLevelAnswer, unlockedLevels, friendStage, gameProgress, dateKey } from '../rewards.js';
 import { monsterSVG } from '../monster.js';
 import { monsterView } from '../monsterView.js';
 import { topBar, screen } from './common.js';
@@ -99,7 +103,14 @@ export function render(ctx, params) {
   let timerStart = 0;
   let timerHandle = null;
   let selected = null;
-  let roundStars = 0;
+  // Žvaigždutės skaičiuojamos raundo pabaigoje: taškų suma × daugikliai.
+  let points = 0; // Σ(užduoties taškai × įvaldymas)
+  let firstOk = 0; // teisingi iš pirmo karto (įvertinimui)
+  let curPoints = 0; // dabartinės užduoties vertė
+  let finished = false;
+  const mult = mode === 'review' ? 1 : modeMult(mode, speed && speed.id);
+  const pKey = level ? practiceKey(game.id, level.id) : null;
+  const repeat = pKey ? repeatMult(today(s, dateKey()).rounds[pKey] || 0) : 1;
   let reviewAllRight = true;
   const log = [];
   const timers = new Set();
@@ -130,6 +141,7 @@ export function render(ctx, params) {
   function nextProblem() {
     if (index >= total) return finish();
     problem = reviewQueue ? reviewQueue[index] : scheduler.next();
+    curPoints = problemPoints(problem) * masteryFactor(s.stats[statKey(problem)]);
     attempts = 0;
     timeouts = 0;
     recorded = false;
@@ -342,6 +354,7 @@ export function render(ctx, params) {
   function learnFromDrawing() {
     if (!useDraw || !lastRead) return;
     s.counters.written += 1;
+    ctx.quest({ type: 'written' });
     if (lastRead.digits.length === lastRead.groups.length) {
       lastRead.groups.forEach((g, k) => addSample(s.handwriting.samples, lastRead.digits[k], g));
       templates = buildTemplates(s.handwriting.samples);
@@ -360,7 +373,7 @@ export function render(ctx, params) {
       stopTimer();
       recordResult(s.stats, problem, correct, ms);
       log.push({ problem, value, correct });
-      if (correct) { s.counters.correct += 1; ctx.played(); learnFromDrawing(); }
+      if (correct) { s.counters.correct += 1; ctx.played(); learnFromDrawing(); points += curPoints; firstOk += 1; }
       else pad?.setEnabled(false);
       if (btn) btn.classList.add('picked');
       ctx.save();
@@ -386,14 +399,17 @@ export function render(ctx, params) {
       locked = true;
       const fast = speed && firstTry && (performance.now() - timerStart) <= speed.seconds * 500;
       stopTimer();
-      let stars = speed ? speed.stars : isWrite ? WRITE_STARS : 1;
+      // Teisingas atsakymas po klaidos moka tiek pat – tai irgi mokymasis.
+      points += curPoints;
+      if (firstTry) firstOk += 1;
+      const stars = Math.max(1, Math.round(curPoints * mult * repeat));
       learnFromDrawing();
-      if (fast) { stars += FAST_BONUS; s.counters.fast += 1; }
+      if (fast) s.counters.fast += 1;
       const streakBonus = updateStreak(s, firstTry);
       s.counters.correct += 1;
       ctx.played();
-      ctx.reward(stars + streakBonus);
-      roundStars += stars + streakBonus;
+      if (streakBonus) ctx.reward(streakBonus);
+      if (s.streak >= 10) ctx.quest({ type: 'streak', streak: s.streak });
 
       problemEl.classList.add('correct');
       selected = value;
@@ -510,10 +526,29 @@ export function render(ctx, params) {
   // ---------- Pabaiga ----------
   function finish() {
     stopTimer();
+    finished = true;
     if (isTest) {
-      ctx.go('results', { log, speed: speed.id, count: total, input: params.input });
+      ctx.go('results', { log, speed: speed.id, count: total, input: params.input, points });
       return;
     }
+    const earned = roundStars({ points, mult, ok: firstOk, total, repeat });
+    const gems = mode === 'mental' ? roundGems({ mode, speed: speed.id, game: game.id, ok: firstOk, total }) : 0;
+    if (mode === 'mental') recordBest(s, 'm', game.id, speed.id, firstOk, total);
+    if (pKey) {
+      const t = today(s, dateKey());
+      t.rounds[pKey] = (t.rounds[pKey] || 0) + 1;
+    }
+    ctx.reward(earned);
+    if (gems) ctx.addGems(gems);
+    ctx.quest({
+      type: 'round', mode, speed: speed && speed.id, game: game.id, ok: firstOk, total,
+      level: level && level.id, topLevel: level && gameProgress(s, game).unlocked,
+    });
+    const why = [];
+    if (speed) why.push(`${speed.emoji} ×${String(mult).replace('.', ',')}`);
+    if (isWrite) why.push(`✍️ ×${String(mult).replace('.', ',')}`);
+    why.push(`${firstOk}/${total}${ratingMult(firstOk, total) !== 1 ? ' ×' + String(ratingMult(firstOk, total)).replace('.', ',') : ''}`);
+    if (repeat < 1) why.push(`🔁 ×${String(repeat).replace('.', ',')}`);
     if (mode === 'review' && reviewAllRight) {
       s.counters.mistakesCleared += 1;
       ctx.checkBadges();
@@ -531,7 +566,9 @@ export function render(ctx, params) {
     overlayEl.append(h('div.overlay-card', null,
       h('div.overlay-emoji', null, '🎉'),
       h('div.overlay-text', null, mode === 'review' && reviewAllRight ? 'Visos klaidos pataisytos!' : 'Šaunu! Raundas baigtas!'),
-      h('div.overlay-stars', null, `+${roundStars} ⭐`),
+      h('div.overlay-stars', null, `+${earned} ⭐`, gems ? ` +${gems} 💎` : ''),
+      h('div.overlay-why', null, why.join(' · ')),
+      repeat < 1 ? h('div.overlay-hint', null, 'Šį lygį šiandien jau daug kartų žaidei – pabandyk ir kitą! 🙂') : null,
       h('div.overlay-buttons', null,
         mode === 'review' ? null : h('button.btn.btn-primary.btn-big', { onclick: () => ctx.go('quiz', params) }, 'Dar kartą! 🔁'),
         h('button.btn.btn-secondary.btn-big', { onclick: () => ctx.go(mode === 'practice' ? 'levels' : 'home') }, mode === 'practice' ? 'Lygiai' : 'Namo 🏠'))));
@@ -547,6 +584,8 @@ export function render(ctx, params) {
       timers.clear();
       removePad();
       document.querySelectorAll('.float-stars').forEach(f => f.remove());
+      // Išėjus raundo viduryje uždirbti taškai neprapuola (tik be įvertinimo daugiklio).
+      if (!finished && !isTest && points > 0) ctx.reward(Math.round(points * mult * repeat));
     },
   };
 }

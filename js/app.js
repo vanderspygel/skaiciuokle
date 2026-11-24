@@ -1,7 +1,8 @@
 // Programos pradžia: būsena, ekranų perjungimas, apdovanojimai.
 
 import { load, save, requestPersist } from './storage.js';
-import { addStars, checkAchievements, markPlayed, dateKey, friendStage } from './rewards.js';
+import { addStars, addGems, checkAchievements, markPlayed, dateKey, friendStage } from './rewards.js';
+import { questEvent, QUEST_STARS, QUEST_GEMS } from './economy.js';
 import { h, toast, confetti, modal } from './ui.js';
 import { monsterView } from './monsterView.js';
 
@@ -51,6 +52,24 @@ const ctx = {
     this.save();
   },
 
+  addGems(n) {
+    addGems(this.state, n);
+    this.updateStarCounters();
+    this.save();
+  },
+
+  // Dienos užduoties įvykis; atlikus – premija ir pranešimas.
+  quest(e) {
+    const done = questEvent(this.state, dateKey(), e);
+    if (!done) return;
+    toast(h('div.badge-toast', null,
+      h('span.badge-toast-icon', null, '🎯'),
+      h('div', null, h('b', null, 'Dienos užduotis atlikta!'), h('div', null, done.text), h('div.small', null, `+${QUEST_STARS} ⭐ +${QUEST_GEMS} 💎`))));
+    confetti(24, { x: window.innerWidth / 2, y: 80 });
+    addGems(this.state, QUEST_GEMS);
+    this.reward(QUEST_STARS);
+  },
+
   // Kviesti po bet kokio skaitiklio pakeitimo.
   checkBadges() {
     const before = friendStage(this.state.monster, this.state);
@@ -76,6 +95,7 @@ const ctx = {
 
   updateStarCounters() {
     document.querySelectorAll('[data-stars]').forEach(el => { el.textContent = this.state.stars; });
+    document.querySelectorAll('[data-gems]').forEach(el => { el.textContent = this.state.gems || 0; });
   },
 
   // Šventinė animacija, kai padarėlis paauga. Rodoma ramiu momentu.
